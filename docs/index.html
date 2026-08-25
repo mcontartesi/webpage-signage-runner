@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webpage Signage Runner - Interactive Web Demo & Simulator</title>
+  <meta name="description" content="Production-grade, unattended Multi-Display Digital Signage Kiosk orchestrator for Windows and Linux. Interactive Web Demo and Multi-Screen Simulator.">
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       CARTEL DE AVISO: MODO DEMOSTRACIÓN NO FUNCIONAL / SIMULADOR WEB
+       ========================================================================== -->
+  <aside class="demo-banner" role="alert" aria-label="Demo Disclaimer Banner">
+    <div class="demo-banner-content">
+      <div class="demo-banner-main">
+        <div class="demo-banner-icon">⚠️</div>
+        <div class="demo-banner-text">
+          <div class="demo-banner-title">
+            <span>MODO DEMOSTRACIÓN INTERACTIVA (SIMULADOR EN NAVEGADOR - NO FUNCIONAL EN HARDWARE REAL)</span>
+            <span class="demo-tag">DEMO WEB</span>
+            <span class="demo-tag simulator">SIMULADOR MULTI-PANTALLA</span>
+          </div>
+
+          <p class="demo-banner-desc desc-es">
+            Esta página es una <strong>demostración interactiva y simulador web</strong> del Asistente de Configuración (<em>Setup Wizard</em>), sistema de contingencia <em>Offline Fallback</em> y API REST de <strong>Webpage Signage Runner</strong>. Dado que se ejecuta dentro del navegador, <strong>no tiene acceso a puertos de video físicos ni controla monitores externos reales</strong>. Para producción 24/7 y control multi-display nativo, descarga los ejecutables oficiales compilados para Windows o Linux.
+          </p>
+
+          <p class="demo-banner-desc desc-en" style="display: none;">
+            This page is an <strong>interactive web demonstration and browser simulator</strong> of the First-Run Setup Wizard, Offline Fallback resilience system, and REST API of <strong>Webpage Signage Runner</strong>. Running in a browser, <strong>it does not control physical external monitors or OS hardware directly</strong>. For 24/7 production unattended digital signage with multi-monitor orchestration, download the compiled native desktop application for Windows or Linux.
+          </p>
+        </div>
+      </div>
+
+      <div class="demo-banner-actions">
+        <div class="demo-banner-buttons">
+          <a href="https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Setup-1.0.0-x64.exe" class="btn-banner btn-banner-win" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.95-1.801"/></svg>
+            Descargar para Windows (.exe)
+          </a>
+          <a href="https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.AppImage" class="btn-banner btn-banner-linux" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.002 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.802 18.796c-1.396.22-2.585-.648-2.657-1.939-.071-1.29 1.002-2.518 2.398-2.739 1.396-.22 2.585.648 2.656 1.938.072 1.291-1.001 2.52-2.397 2.74zm3.604 0c-1.396.22-2.585-.648-2.656-1.939-.072-1.29 1.001-2.518 2.397-2.739 1.396-.22 2.585.648 2.657 1.938.071 1.291-1.002 2.52-2.398 2.74z"/></svg>
+            Descargar para Linux (AppImage / .deb)
+          </a>
+          <a href="https://github.com/mcontartesi/webpage-signage-runner" class="btn-banner btn-banner-gh" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub Repo
+          </a>
+        </div>
+
+        <div class="demo-lang-toggle">
+          <button class="btn-lang active" data-lang="es">ES</button>
+          <button class="btn-lang" data-lang="en">EN</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==========================================================================
+       APP HEADER
+       ========================================================================== -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="#" class="header-brand">
+        <div class="logo-wrap">
+          <img src="assets/icon.svg" alt="Logo">
+          <span class="live-badge" title="Simulator Engine Active"></span>
+        </div>
+        <div>
+          <h1 class="brand-title">
+            Webpage Signage Runner
+            <span class="version-chip">v1.0.0</span>
+          </h1>
+          <p class="brand-subtitle">Multi-Display Digital Signage Kiosk Orchestrator • By Maximiliano Contartesi</p>
+        </div>
+      </a>
+
+      <!-- Navigation Tabs -->
+      <nav class="header-nav" role="tablist">
+        <button class="nav-tab active" data-tab="wizard" role="tab">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          Setup Wizard
+        </button>
+        <button class="nav-tab" data-tab="simulator" role="tab">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          Kiosk Simulator
+        </button>
+        <button class="nav-tab" data-tab="api" role="tab">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          REST API & Swagger
+        </button>
+        <button class="nav-tab" data-tab="downloads" role="tab">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Downloads & Docs
+        </button>
+      </nav>
+
+      <!-- Header Action Buttons -->
+      <div class="header-actions">
+        <button id="btn-identify-global" class="btn btn-secondary btn-small" title="Simular identificación de pantallas">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          Identify Screens
+        </button>
+        <button id="btn-refresh-global" class="btn btn-secondary btn-small" title="Re-scan displays">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          Refresh
+        </button>
+        <button id="btn-logs-modal" class="btn btn-secondary btn-small" title="Open diagnostic logs">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          Logs
+        </button>
+        <button id="btn-about-modal" class="btn btn-secondary btn-small" title="View credits & author">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          About
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================== -->
+  <main class="main-wrapper">
+
+    <!-- ==========================================================================
+         TAB 1: SETUP WIZARD
+         ========================================================================== -->
+    <section id="tab-wizard" class="tab-pane active">
+      <!-- Displays Section -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <h2 class="section-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              Connected Displays & Feeds
+            </h2>
+            <span id="display-count-badge" class="badge badge-primary">3 monitors configured</span>
+          </div>
+          <div>
+            <button id="btn-add-display" class="btn btn-secondary btn-small">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              + Add Virtual Display
+            </button>
+          </div>
+        </div>
+        <p class="section-desc">Assign specific target URLs, HTTP methods, Bearer tokens, zoom scaling, and cache reload intervals per physical screen.</p>
+
+        <!-- Dynamic Displays Grid -->
+        <div id="displays-list" class="displays-grid" style="margin-top: 16px;"></div>
+      </div>
+
+      <!-- Global Settings Section -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            System & Global Preferences
+          </h2>
+          <p class="section-desc">Tune resilience watchdog, remote HTTP control API, and operating system startup integration.</p>
+        </div>
+
+        <div class="settings-grid">
+          <!-- General & Recovery -->
+          <div class="card">
+            <h3 class="card-title">General & Recovery</h3>
+            <div class="form-group">
+              <label>Global Default URL</label>
+              <input type="url" class="form-input" value="https://www.youtube.com" placeholder="https://www.youtube.com">
+              <span class="form-hint">Used when new unconfigured monitors are hotplugged.</span>
+            </div>
+
+            <div class="form-group">
+              <label>Emergency Setup Hotkey</label>
+              <input type="text" class="form-input" value="Ctrl+Shift+C (or CmdOrCtrl+Alt+S)">
+              <span class="form-hint">Press this combination anytime in kiosk mode to unlock and open setup.</span>
+            </div>
+
+            <div class="form-checkbox-group">
+              <label class="checkbox-container">
+                <input type="checkbox" checked>
+                <span class="checkmark"></span>
+                <span class="checkbox-label">Launch automatically on OS boot (Autostart)</span>
+              </label>
+            </div>
+
+            <div class="form-checkbox-group">
+              <label class="checkbox-container">
+                <input type="checkbox" checked>
+                <span class="checkmark"></span>
+                <span class="checkbox-label">Hide mouse pointer on all screens by default</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- HTTP Control API -->
+          <div class="card">
+            <h3 class="card-title">Remote Control & Health API</h3>
+            <div class="form-checkbox-group">
+              <label class="checkbox-container">
+                <input type="checkbox" checked>
+                <span class="checkmark"></span>
+                <span class="checkbox-label">Enable Embedded REST API</span>
+              </label>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>Port</label>
+                <input type="number" class="form-input" value="9191">
+              </div>
+              <div class="form-group flex-2">
+                <label>Bind Host</label>
+                <input type="text" class="form-input" value="0.0.0.0">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>API Auth Token (Optional)</label>
+              <input type="password" class="form-input" placeholder="signage-secret-token-12345">
+              <span class="form-hint">Header: <code>Authorization: Bearer &lt;token&gt;</code></span>
+            </div>
+
+            <div class="api-endpoints-preview">
+              <span class="endpoint-tag">GET /health</span>
+              <span class="endpoint-tag">GET /api/status</span>
+              <span class="endpoint-tag">POST /api/reload</span>
+              <span class="endpoint-tag">POST /api/displays/:id/url</span>
+            </div>
+          </div>
+
+          <!-- Watchdog & Resilience -->
+          <div class="card">
+            <h3 class="card-title">Watchdog & Resilience</h3>
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>Cache Reload (Mins)</label>
+                <input type="number" class="form-input" value="60">
+                <span class="form-hint">0 disables auto-reload.</span>
+              </div>
+              <div class="form-group flex-1">
+                <label>Offline Retry (Secs)</label>
+                <input type="number" class="form-input" value="10">
+                <span class="form-hint">Reconnection interval.</span>
+              </div>
+            </div>
+
+            <div class="form-checkbox-group">
+              <label class="checkbox-container">
+                <input type="checkbox" checked>
+                <span class="checkmark"></span>
+                <span class="checkbox-label">Purge Chromium cache during scheduled reload</span>
+              </label>
+            </div>
+
+            <div class="form-checkbox-group">
+              <label class="checkbox-container">
+                <input type="checkbox" checked>
+                <span class="checkmark"></span>
+                <span class="checkbox-label">Auto-recreate windows on process crash or OOM</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Bar -->
+      <div class="wizard-footer-bar">
+        <div id="status-toast" class="status-toast hidden"></div>
+        <button id="btn-save-launch" class="btn btn-primary btn-large">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Save & Launch Kiosk Simulator
+        </button>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         TAB 2: MULTI-SCREEN KIOSK SIMULATOR
+         ========================================================================== -->
+    <section id="tab-simulator" class="tab-pane">
+      <div class="simulator-header">
+        <div>
+          <h2 class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            Multi-Display Video Wall & Screen Simulator
+          </h2>
+          <p class="section-desc">Simulate live signage feeds, scheduled cache purging, network loss fallback (offline.html), and screen identification.</p>
+        </div>
+
+        <div class="simulator-controls">
+          <button id="sim-btn-offline" class="btn btn-danger btn-small" title="Simulate internet connection drop">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+            Simulate Network Loss
+          </button>
+          <button id="sim-btn-reload" class="btn btn-secondary btn-small" title="Simulate watchdog cache reload">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            Trigger Cache Reload
+          </button>
+          <button id="sim-btn-hotplug" class="btn btn-secondary btn-small" title="Simulate display disconnect/connect">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+            Simulate Hot-Plug
+          </button>
+          <button id="sim-btn-identify" class="btn btn-secondary btn-small" title="Flash screen identification numbers">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            Identify Screens
+          </button>
+          <button id="sim-btn-exit" class="btn btn-primary btn-small" title="Exit kiosk mode (Ctrl+Shift+C)">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            Exit Kiosk (Ctrl+Shift+C)
+          </button>
+        </div>
+      </div>
+
+      <!-- Simulator Room with Monitors -->
+      <div class="simulator-room">
+        <div id="simulator-screens-grid" class="simulator-screens-grid"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         TAB 3: REST API & SWAGGER EXPLORER
+         ========================================================================== -->
+    <section id="tab-api" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            Embedded REST API & Swagger UI Explorer
+          </h2>
+          <p class="section-desc">Test interactive endpoints for remote health monitoring, dynamic URL push, cache reloads, and live screen capture.</p>
+        </div>
+      </div>
+
+      <div class="api-explorer-layout">
+        <!-- Endpoint list -->
+        <div class="endpoint-list">
+          <div class="endpoint-item active" data-endpoint="/health" data-method="GET">
+            <span class="method-tag method-get">GET</span>
+            <span class="endpoint-path">/health</span>
+          </div>
+          <div class="endpoint-item" data-endpoint="/api/status" data-method="GET">
+            <span class="method-tag method-get">GET</span>
+            <span class="endpoint-path">/api/status</span>
+          </div>
+          <div class="endpoint-item" data-endpoint="/api/displays/1/url" data-method="POST">
+            <span class="method-tag method-post">POST</span>
+            <span class="endpoint-path">/api/displays/:id/url</span>
+          </div>
+          <div class="endpoint-item" data-endpoint="/api/reload" data-method="POST">
+            <span class="method-tag method-post">POST</span>
+            <span class="endpoint-path">/api/reload</span>
+          </div>
+          <div class="endpoint-item" data-endpoint="/api/identify" data-method="POST">
+            <span class="method-tag method-post">POST</span>
+            <span class="endpoint-path">/api/identify</span>
+          </div>
+        </div>
+
+        <!-- API Tester Form & Console -->
+        <div class="api-tester-card">
+          <div class="form-row">
+            <div class="form-group" style="width: 120px;">
+              <label>Method</label>
+              <select id="api-test-method" class="form-select">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label>Request Path</label>
+              <input type="text" id="api-test-path" class="form-input" value="/health">
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+              <button id="btn-api-send" class="btn btn-primary">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                Send Request
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>JSON Request Body (For POST / PUT)</label>
+            <textarea id="api-test-body" class="form-textarea" placeholder="{}"></textarea>
+          </div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Simulated API Response</label>
+              <span id="api-response-status" class="badge badge-success">200 OK</span>
+            </div>
+            <pre id="api-response-viewer" class="api-response-viewer">{
+  "status": "ok",
+  "app": "webpage-signage-runner",
+  "version": "1.0.0",
+  "uptimeSeconds": 86400,
+  "timestamp": "2026-08-25T22:00:00.000Z"
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         TAB 4: DOWNLOADS & PRODUCTION SETUP
+         ========================================================================== -->
+    <section id="tab-downloads" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download Native Binaries (Windows & Linux)
+          </h2>
+          <p class="section-desc">Standalone, pre-compiled release packages with zero external dependencies.</p>
+        </div>
+      </div>
+
+      <div class="downloads-grid">
+        <!-- Windows Card -->
+        <div class="download-card">
+          <div>
+            <div class="download-card-header">
+              <span class="os-icon">🪟</span>
+              <div>
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: #f8fafc;">Windows Releases</h3>
+                <p style="font-size: 0.78rem; color: var(--text-secondary);">Windows 10, 11 & Windows Server x64</p>
+              </div>
+            </div>
+
+            <ul class="download-list" style="margin-top: 16px;">
+              <li class="download-list-item">
+                <div class="download-file-info">
+                  <span class="download-file-name">Webpage-Signage-Runner-Setup-1.0.0-x64.exe</span>
+                  <span class="download-file-desc">Official NSIS Installer (Desktop & Startup shortcut)</span>
+                </div>
+                <a href="https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Setup-1.0.0-x64.exe" class="btn btn-primary btn-small">Download</a>
+              </li>
+              <li class="download-list-item">
+                <div class="download-file-info">
+                  <span class="download-file-name">Webpage-Signage-Runner-Portable-1.0.0-x64.exe</span>
+                  <span class="download-file-desc">Portable standalone executable (Runs from USB or folder)</span>
+                </div>
+                <a href="https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Portable-1.0.0-x64.exe" class="btn btn-secondary btn-small">Download</a>
+              </li>
+            </ul>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">
+            💡 <em>Includes autostart registry integration and power save blocker.</em>
+          </div>
+        </div>
+
+        <!-- Linux Card -->
+        <div class="download-card">
+          <div>
+            <div class="download-card-header">
+              <span class="os-icon">🐧</span>
+              <div>
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: #f8fafc;">Linux Packages</h3>
+                <p style="font-size: 0.78rem; color: var(--text-secondary);">Ubuntu, Debian, Fedora, Arch, Raspberry Pi OS</p>
+              </div>
+            </div>
+
+            <ul class="download-list" style="margin-top: 16px;">
+              <li class="download-list-item">
+                <div class="download-file-info">
+                  <span class="download-file-name">webpage-signage-runner-1.0.0-x64.AppImage</span>
+                  <span class="download-file-desc">Universal portable Linux binary</span>
+                </div>
+                <a href="https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.AppImage" class="btn btn-primary btn-small">Download</a>
+              </li>
+              <li class="download-list-item">
+                <div class="download-file-info">
+                  <span class="download-file-name">webpage-signage-runner-1.0.0-x64.deb</span>
+                  <span class="download-file-desc">Debian / Ubuntu / Linux Mint package</span>
+                </div>
+                <a href="https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.deb" class="btn btn-secondary btn-small">Download</a>
+              </li>
+            </ul>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">
+            💡 <em>Supports X11, Wayland, and systemd user services.</em>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       MODAL: ABOUT & CREDITS
+       ========================================================================== -->
+  <div id="about-modal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="logo-wrap" style="width: 36px; height: 36px;">
+            <img src="assets/icon.svg" alt="Logo">
+          </div>
+          <div>
+            <h2 class="modal-title">Webpage Signage Runner</h2>
+            <p class="modal-version">Version 1.0.0 • Open Source MIT</p>
+          </div>
+        </div>
+        <button class="btn-close modal-close-trigger">&times;</button>
+      </div>
+
+      <div class="credits-card">
+        <div class="credits-title">Created and maintained with ❤️ by <strong>Maximiliano Contartesi</strong></div>
+        <ul class="credits-list">
+          <li>
+            <span>💼</span>
+            <strong>LinkedIn:</strong>
+            <a href="https://www.linkedin.com/in/maxiconta/" target="_blank" rel="noopener">maxiconta</a>
+          </li>
+          <li>
+            <span>🐙</span>
+            <strong>GitHub:</strong>
+            <a href="https://github.com/mcontartesi" target="_blank" rel="noopener">@mcontartesi</a>
+          </li>
+          <li>
+            <span>✉️</span>
+            <strong>Email / Contact:</strong>
+            <a href="mailto:maxiconta@gmail.com">maxiconta [at] gmail [dot] com</a>
+          </li>
+          <li>
+            <span>📝</span>
+            <strong>Medium:</strong>
+            <a href="https://medium.com/@maxiconta" target="_blank" rel="noopener">@maxiconta</a>
+          </li>
+        </ul>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn btn-primary modal-close-trigger">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: LIVE DIAGNOSTIC LOGS
+       ========================================================================== -->
+  <div id="logs-modal" class="modal-backdrop hidden">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <div>
+            <h2 class="modal-title">Live Diagnostic Logs</h2>
+            <p class="modal-version">Simulated Engine Log Stream</p>
+          </div>
+        </div>
+        <button class="btn-close modal-close-trigger">&times;</button>
+      </div>
+
+      <div id="logs-console" class="logs-console"></div>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn btn-primary modal-close-trigger">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       OVERLAY: SCREEN IDENTIFICATION
+       ========================================================================== -->
+  <div id="identify-overlay" class="identify-overlay hidden">
+    <div class="identify-card">
+      <div id="overlay-screen-num" class="identify-num">1</div>
+      <div id="overlay-screen-label" class="identify-label">PRIMARY VIDEO WALL</div>
+      <div class="identify-sub">Multi-Display Hardware Identification Pulse</div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

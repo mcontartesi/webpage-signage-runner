@@ -5,6 +5,7 @@
 **Production-grade, unattended Multi-Display Digital Signage Kiosk orchestrator for Windows and Linux.**
 
 [![Release: v1.0.0](https://img.shields.io/badge/Release-v1.0.0-0ea5e9?logo=github&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/releases)
+[![Wiki Documentation](https://img.shields.io/badge/Documentation-GitHub%20Wiki-blueviolet?logo=gitbook&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/wiki)
 [![Downloads](https://img.shields.io/badge/Downloads-Windows%20%7C%20Linux-10b981?logo=windows&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -13,6 +14,7 @@
 [![Created By Maximiliano Contartesi](https://img.shields.io/badge/Author-Maximiliano%20Contartesi-0ea5e9?logo=github&logoColor=white)](https://github.com/mcontartesi)
 
 <p align="center">
+  <a href="https://github.com/mcontartesi/webpage-signage-runner/wiki"><b>📚 Official GitHub Wiki</b></a> •
   <a href="#-quick-download--descargas-directas"><b>📥 Quick Download</b></a> •
   <a href="#key-features">Key Features</a> •
   <a href="#first-run-wizard">First-Run Wizard</a> •
