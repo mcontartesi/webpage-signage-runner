@@ -9,7 +9,13 @@ export const DisplayConfigSchema = z.object({
   /** Friendly label for the monitor (e.g. "Samsung 55' Main Hall") */
   label: z.string().optional(),
   /** The target URL to display in kiosk mode */
-  url: z.string().url('Target must be a valid URL (http:// or https://)'),
+  url: z.string().url('Target must be a valid URL (http:// or https://)').default('https://www.youtube.com'),
+  /** HTTP method for the initial/reloading request (GET, POST, PUT) */
+  httpMethod: z.enum(['GET', 'POST', 'PUT']).default('GET'),
+  /** Custom HTTP headers (e.g. Authorization: Bearer <token>, X-Api-Key, etc.) */
+  headers: z.record(z.string()).optional(),
+  /** Raw request body string for POST/PUT requests (JSON, XML, or form-urlencoded) */
+  requestBody: z.string().optional(),
   /** Fallback URL or local asset path if primary URL fails permanently */
   fallbackUrl: z.string().optional(),
   /** Interval in minutes to clear cache and reload page to prevent memory leaks. 0 to disable. */
@@ -71,7 +77,7 @@ export const SignageConfigSchema = z.object({
   $schema: z.string().optional(),
   version: z.string().default('1.0.0'),
   /** Default URL to assign when new displays are hotplugged or not configured */
-  defaultUrl: z.string().url().default('https://antigravity.google'),
+  defaultUrl: z.string().url().default('https://www.youtube.com'),
   /** Global cursor hiding toggle */
   hideCursorGlobal: z.boolean().default(true),
   /** Global cache reload interval (minutes) */

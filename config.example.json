@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/mcontartesi/webpage-signage-runner/main/schema.json",
   "version": "1.0.0",
-  "defaultUrl": "https://antigravity.google",
+  "defaultUrl": "https://www.youtube.com",
   "hideCursorGlobal": true,
   "defaultReloadIntervalMinutes": 60,
   "defaultRetryIntervalSeconds": 10,
@@ -23,8 +23,13 @@
   "displays": [
     {
       "id": 1,
-      "label": "Main Entrance Video Wall (4K)",
-      "url": "https://grafana.company.internal/d/entrance-metrics?kiosk",
+      "label": "Main Entrance Video Wall (YouTube Live Feed)",
+      "url": "https://www.youtube.com",
+      "httpMethod": "GET",
+      "headers": {
+        "Authorization": "Bearer sample-bearer-token-123",
+        "X-Custom-Secret": "kiosk-station-alpha"
+      },
       "fallbackUrl": "",
       "reloadIntervalMinutes": 60,
       "retryIntervalSeconds": 10,
@@ -34,8 +39,14 @@
     },
     {
       "id": 2,
-      "label": "Reception Directory Display",
-      "url": "https://directory.company.internal/lobby",
+      "label": "Internal Metrics API Feed (POST)",
+      "url": "https://dashboard.company.internal/kiosk",
+      "httpMethod": "POST",
+      "headers": {
+        "Authorization": "Bearer metrics-token-9988",
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{\"stationId\": 2, \"kioskMode\": true}",
       "fallbackUrl": "",
       "reloadIntervalMinutes": 120,
       "retryIntervalSeconds": 15,

@@ -6,6 +6,9 @@ export interface DisplayState {
   displayId: number;
   window: BrowserWindow;
   targetUrl: string;
+  httpMethod?: 'GET' | 'POST' | 'PUT';
+  headers?: Record<string, string>;
+  requestBody?: string;
   fallbackUrl?: string;
   status: 'idle' | 'loading' | 'active' | 'offline' | 'unresponsive' | 'error';
   lastReloadTime: string | null;
@@ -27,6 +30,35 @@ export class WatchdogService {
   }
 
   /**
+   * Builds Electron loadURL options from method, headers, and requestBody.
+   */
+  public static buildLoadOptions(
+    httpMethod?: 'GET' | 'POST' | 'PUT',
+    headers?: Record<string, string>,
+    requestBody?: string
+  ): { extraHeaders?: string; postData?: Array<{ type: 'rawData'; bytes: Buffer }> } {
+    const options: { extraHeaders?: string; postData?: Array<{ type: 'rawData'; bytes: Buffer }> } = {};
+
+    if (headers && Object.keys(headers).length > 0) {
+      options.extraHeaders = Object.entries(headers)
+        .filter(([k, v]) => k.trim() !== '' && v !== undefined)
+        .map(([k, v]) => `${k.trim()}: ${v}`)
+        .join('\n');
+    }
+
+    if ((httpMethod === 'POST' || httpMethod === 'PUT') && requestBody !== undefined) {
+      options.postData = [
+        {
+          type: 'rawData',
+          bytes: Buffer.from(requestBody, 'utf8'),
+        },
+      ];
+    }
+
+    return options;
+  }
+
+  /**
    * Registers a BrowserWindow with the watchdog service.
    */
   public registerWindow(
@@ -35,7 +67,10 @@ export class WatchdogService {
     targetUrl: string,
     fallbackUrl?: string,
     reloadIntervalMinutes: number = 60,
-    retryIntervalSeconds: number = 10
+    retryIntervalSeconds: number = 10,
+    httpMethod: 'GET' | 'POST' | 'PUT' = 'GET',
+    headers?: Record<string, string>,
+    requestBody?: string
   ): void {
     this.unregisterWindow(displayId);
 
@@ -43,6 +78,9 @@ export class WatchdogService {
       displayId,
       window: win,
       targetUrl,
+      httpMethod,
+      headers,
+      requestBody,
       fallbackUrl,
       status: 'loading',
       lastReloadTime: new Date().toISOString(),
@@ -56,7 +94,7 @@ export class WatchdogService {
     this.attachEventListeners(state);
     this.scheduleCacheReload(state);
 
-    logger.info('Watchdog', `Registered display #${displayId} [Target: ${targetUrl}]`);
+    logger.info('Watchdog', `Registered display #${displayId} [Target: ${httpMethod} ${targetUrl}]`);
   }
 
   /**
@@ -208,9 +246,10 @@ export class WatchdogService {
       state.retryTimer = undefined;
     }
 
-    logger.info('Watchdog', `Retrying load for display #${displayId}: ${state.targetUrl}`);
+    logger.info('Watchdog', `Retrying load for display #${displayId}: [${state.httpMethod || 'GET'}] ${state.targetUrl}`);
     state.status = 'loading';
-    state.window.loadURL(state.targetUrl).catch((err) => {
+    const loadOptions = WatchdogService.buildLoadOptions(state.httpMethod, state.headers, state.requestBody);
+    state.window.loadURL(state.targetUrl, loadOptions).catch((err) => {
       logger.warn('Watchdog', `Retry load failed for display #${displayId}:`, err);
     });
   }
@@ -239,7 +278,8 @@ export class WatchdogService {
       }
 
       state.lastReloadTime = new Date().toISOString();
-      state.window.loadURL(state.targetUrl).catch(() => {});
+      const loadOptions = WatchdogService.buildLoadOptions(state.httpMethod, state.headers, state.requestBody);
+      state.window.loadURL(state.targetUrl, loadOptions).catch(() => {});
     }, intervalMs);
   }
 
@@ -259,7 +299,8 @@ export class WatchdogService {
     }
 
     state.lastReloadTime = new Date().toISOString();
-    state.window.loadURL(state.targetUrl).catch(() => {});
+    const loadOptions = WatchdogService.buildLoadOptions(state.httpMethod, state.headers, state.requestBody);
+    state.window.loadURL(state.targetUrl, loadOptions).catch(() => {});
     return true;
   }
 
@@ -275,17 +316,28 @@ export class WatchdogService {
   }
 
   /**
-   * Updates target URL for a display.
+   * Updates target URL and optional HTTP request settings for a display.
    */
-  public updateTargetUrl(displayId: number, newUrl: string, reloadNow: boolean = true): boolean {
+  public updateTargetUrl(
+    displayId: number,
+    newUrl: string,
+    reloadNow: boolean = true,
+    httpMethod?: 'GET' | 'POST' | 'PUT',
+    headers?: Record<string, string>,
+    requestBody?: string
+  ): boolean {
     const state = this.displayStates.get(displayId);
     if (!state) return false;
 
     state.targetUrl = newUrl;
     state.failureCount = 0;
+    if (httpMethod) state.httpMethod = httpMethod;
+    if (headers !== undefined) state.headers = headers;
+    if (requestBody !== undefined) state.requestBody = requestBody;
 
     if (reloadNow && !state.window.isDestroyed()) {
-      state.window.loadURL(newUrl).catch(() => {});
+      const loadOptions = WatchdogService.buildLoadOptions(state.httpMethod, state.headers, state.requestBody);
+      state.window.loadURL(newUrl, loadOptions).catch(() => {});
     }
     return true;
   }

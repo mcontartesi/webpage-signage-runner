@@ -16,9 +16,15 @@ class SetupController {
   private displayCountBadge = document.getElementById('display-count-badge') as HTMLSpanElement;
   private btnIdentify = document.getElementById('btn-identify') as HTMLButtonElement;
   private btnRefresh = document.getElementById('btn-refresh') as HTMLButtonElement;
+  private btnAbout = document.getElementById('btn-about') as HTMLButtonElement;
   private btnLogs = document.getElementById('btn-logs') as HTMLButtonElement;
   private btnSave = document.getElementById('btn-save') as HTMLButtonElement;
   private statusToast = document.getElementById('status-toast') as HTMLDivElement;
+
+  // About Modal Elements
+  private aboutModal = document.getElementById('about-modal') as HTMLDivElement;
+  private btnCloseAbout = document.getElementById('btn-close-about') as HTMLButtonElement;
+  private btnModalOk = document.getElementById('btn-modal-ok') as HTMLButtonElement;
 
   // Global Inputs
   private inputGlobalDefaultUrl = document.getElementById('global-default-url') as HTMLInputElement;
@@ -50,6 +56,32 @@ class SetupController {
       this.showToast('Refreshed display monitors list', 'success');
     });
 
+    if (this.btnAbout) {
+      this.btnAbout.addEventListener('click', () => {
+        this.openAboutModal();
+      });
+    }
+
+    if (this.btnCloseAbout) {
+      this.btnCloseAbout.addEventListener('click', () => {
+        this.closeAboutModal();
+      });
+    }
+
+    if (this.btnModalOk) {
+      this.btnModalOk.addEventListener('click', () => {
+        this.closeAboutModal();
+      });
+    }
+
+    if (this.aboutModal) {
+      this.aboutModal.addEventListener('click', (e) => {
+        if (e.target === this.aboutModal) {
+          this.closeAboutModal();
+        }
+      });
+    }
+
     this.btnLogs.addEventListener('click', async () => {
       await window.signageAPI.openLogsFolder();
     });
@@ -57,6 +89,18 @@ class SetupController {
     this.btnSave.addEventListener('click', async () => {
       await this.saveAndLaunch();
     });
+  }
+
+  private openAboutModal(): void {
+    if (this.aboutModal) {
+      this.aboutModal.classList.remove('hidden');
+    }
+  }
+
+  private closeAboutModal(): void {
+    if (this.aboutModal) {
+      this.aboutModal.classList.add('hidden');
+    }
   }
 
   private async loadData(): Promise<void> {
@@ -72,7 +116,7 @@ class SetupController {
   }
 
   private populateGlobalSettings(): void {
-    this.inputGlobalDefaultUrl.value = this.config.defaultUrl || 'https://antigravity.google';
+    this.inputGlobalDefaultUrl.value = this.config.defaultUrl || 'https://www.youtube.com';
     this.inputGlobalShortcut.value = this.config.emergencyShortcut || 'CommandOrControl+Shift+C';
     this.inputGlobalAutostart.checked = this.config.autoStartOnBoot ?? true;
     this.inputGlobalHideCursor.checked = this.config.hideCursorGlobal ?? true;
@@ -86,6 +130,39 @@ class SetupController {
     this.inputWatchdogRetry.value = String(this.config.defaultRetryIntervalSeconds ?? 10);
     this.inputWatchdogClearCache.checked = this.config.watchdog?.clearCacheOnReload ?? true;
     this.inputWatchdogAutoRecover.checked = this.config.watchdog?.autoRecoverCrashes ?? true;
+  }
+
+  private formatHeadersToString(headers?: Record<string, string>): string {
+    if (!headers || Object.keys(headers).length === 0) return '';
+    return Object.entries(headers)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join('\n');
+  }
+
+  private parseHeadersFromString(str: string): Record<string, string> | undefined {
+    const trimmed = str.trim();
+    if (!trimmed) return undefined;
+
+    // Check if JSON
+    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+      try {
+        return JSON.parse(trimmed);
+      } catch {}
+    }
+
+    const headers: Record<string, string> = {};
+    const lines = trimmed.split('\n');
+    for (const line of lines) {
+      const idx = line.indexOf(':');
+      if (idx > 0) {
+        const key = line.slice(0, idx).trim();
+        const val = line.slice(idx + 1).trim();
+        if (key) {
+          headers[key] = val;
+        }
+      }
+    }
+    return Object.keys(headers).length > 0 ? headers : undefined;
   }
 
   private renderDisplays(): void {
@@ -104,7 +181,10 @@ class SetupController {
     this.displays.forEach((display, index) => {
       // Find existing config or synthesize defaults
       const existingConfig = this.config.displays.find((d) => String(d.id) === String(display.id));
-      const targetUrl = existingConfig?.url || this.config.defaultUrl || 'https://antigravity.google';
+      const targetUrl = existingConfig?.url || this.config.defaultUrl || 'https://www.youtube.com';
+      const httpMethod = existingConfig?.httpMethod || 'GET';
+      const headersStr = this.formatHeadersToString(existingConfig?.headers);
+      const requestBody = existingConfig?.requestBody || '';
       const fallbackUrl = existingConfig?.fallbackUrl || '';
       const reloadMins = existingConfig?.reloadIntervalMinutes ?? this.config.defaultReloadIntervalMinutes ?? 60;
       const retrySecs = existingConfig?.retryIntervalSeconds ?? this.config.defaultRetryIntervalSeconds ?? 10;
@@ -134,12 +214,46 @@ class SetupController {
         <div class="form-group" style="margin-bottom: 12px;">
           <label for="url-${display.id}">Target Signage URL</label>
           <div class="form-input-group">
-            <input type="url" id="url-${display.id}" class="form-input display-url-input" value="${targetUrl}" placeholder="https://example.com/dashboard" required>
+            <input type="url" id="url-${display.id}" class="form-input display-url-input" value="${targetUrl}" placeholder="https://www.youtube.com" required>
             <button type="button" class="btn btn-secondary btn-small btn-test-url" data-target="url-${display.id}">Test</button>
           </div>
         </div>
 
-        <div class="form-group" style="margin-bottom: 12px;">
+        <!-- Advanced HTTP Method & Custom Headers Section -->
+        <details class="details-advanced" ${httpMethod !== 'GET' || headersStr || requestBody ? 'open' : ''}>
+          <summary>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            Advanced HTTP Request Options (GET/POST/PUT, Headers, Bearer Token)
+          </summary>
+          <div class="details-content">
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="method-${display.id}">HTTP Method</label>
+                <select id="method-${display.id}" class="form-select display-method-input">
+                  <option value="GET" ${httpMethod === 'GET' ? 'selected' : ''}>GET</option>
+                  <option value="POST" ${httpMethod === 'POST' ? 'selected' : ''}>POST</option>
+                  <option value="PUT" ${httpMethod === 'PUT' ? 'selected' : ''}>PUT</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="headers-${display.id}">Custom HTTP Headers (Bearer Token, Secrets)</label>
+              <textarea id="headers-${display.id}" class="form-textarea display-headers-input" placeholder="Authorization: Bearer your-secret-token\nX-Custom-Auth: secret123">${headersStr}</textarea>
+              <span class="form-hint">One header per line (<code>Header: Value</code>) or JSON format.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="body-${display.id}">Request Body (Payload for POST / PUT)</label>
+              <textarea id="body-${display.id}" class="form-textarea display-body-input" placeholder='{"kiosk": 1, "station": "A"}'>${requestBody}</textarea>
+            </div>
+          </div>
+        </details>
+
+        <div class="form-group" style="margin-top: 12px; margin-bottom: 12px;">
           <label for="fallback-${display.id}">Fallback Offline Asset / URL (Optional)</label>
           <input type="text" id="fallback-${display.id}" class="form-input display-fallback-input" value="${fallbackUrl}" placeholder="file:///path/or/url">
         </div>
@@ -227,6 +341,9 @@ class SetupController {
     for (const card of displayCards) {
       const displayId = card.dataset.displayId!;
       const urlInput = card.querySelector('.display-url-input') as HTMLInputElement;
+      const methodSelect = card.querySelector('.display-method-input') as HTMLSelectElement;
+      const headersInput = card.querySelector('.display-headers-input') as HTMLTextAreaElement;
+      const bodyInput = card.querySelector('.display-body-input') as HTMLTextAreaElement;
       const fallbackInput = card.querySelector('.display-fallback-input') as HTMLInputElement;
       const reloadInput = card.querySelector('.display-reload-input') as HTMLInputElement;
       const retryInput = card.querySelector('.display-retry-input') as HTMLInputElement;
@@ -241,9 +358,16 @@ class SetupController {
         return;
       }
 
+      const httpMethod = (methodSelect?.value as 'GET' | 'POST' | 'PUT') || 'GET';
+      const parsedHeaders = headersInput ? this.parseHeadersFromString(headersInput.value) : undefined;
+      const requestBody = bodyInput ? bodyInput.value.trim() || undefined : undefined;
+
       displaysConfig.push({
         id: isNaN(Number(displayId)) ? displayId : Number(displayId),
         url: targetUrl,
+        httpMethod,
+        headers: parsedHeaders,
+        requestBody,
         fallbackUrl: fallbackInput.value.trim() || undefined,
         reloadIntervalMinutes: parseInt(reloadInput.value, 10) || 60,
         retryIntervalSeconds: parseInt(retryInput.value, 10) || 10,

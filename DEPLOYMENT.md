@@ -134,3 +134,15 @@ unclutter -idle 0.1 -root &
   curl -X POST http://<kiosk-ip>:9191/api/identify
   ```
   This immediately flashes a large identification number on every connected screen for 5 seconds.
+
+---
+
+## About & Author Credits
+
+Webpage Signage Runner is designed and engineered by **Maximiliano Contartesi** (Software Architect & Principal Engineer).
+
+Created and maintained with ❤️ by [**Maximiliano Contartesi**](https://github.com/mcontartesi).
+- 💼 **LinkedIn:** [maxiconta](https://www.linkedin.com/in/maxiconta/)
+- 🐙 **GitHub:** [@mcontartesi](https://github.com/mcontartesi)
+- ✉️ **Email / Contact:** maxiconta [at] gmail [dot] com
+- 📝 **Medium:** [@maxiconta](https://medium.com/@maxiconta)

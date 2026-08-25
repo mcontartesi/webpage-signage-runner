@@ -5,6 +5,18 @@ export const APP_TITLE = 'Webpage Signage Runner';
 export const APP_AUTHOR = 'Maximiliano Contartesi';
 export const APP_VERSION = '1.0.0';
 
+export const AUTHOR_CREDITS = {
+  name: 'Maximiliano Contartesi',
+  githubUrl: 'https://github.com/mcontartesi',
+  githubUser: '@mcontartesi',
+  linkedinUrl: 'https://www.linkedin.com/in/maxiconta/',
+  linkedinUser: 'maxiconta',
+  email: 'maxiconta@gmail.com',
+  emailDisplay: 'maxiconta [at] gmail [dot] com',
+  mediumUrl: 'https://medium.com/@maxiconta',
+  mediumUser: '@maxiconta',
+};
+
 export const DEFAULT_PORT = 9191;
 export const DEFAULT_HOST = '0.0.0.0';
 export const DEFAULT_RETRY_INTERVAL_SECONDS = 10;
@@ -18,7 +30,7 @@ export const DEFAULT_EMERGENCY_SHORTCUTS = [
 
 export const DEFAULT_CONFIG: SignageConfig = {
   version: APP_VERSION,
-  defaultUrl: 'https://antigravity.google',
+  defaultUrl: 'https://www.youtube.com',
   hideCursorGlobal: true,
   defaultReloadIntervalMinutes: DEFAULT_RELOAD_INTERVAL_MINUTES,
   defaultRetryIntervalSeconds: DEFAULT_RETRY_INTERVAL_SECONDS,

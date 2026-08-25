@@ -61,3 +61,13 @@ Thank you for your interest in contributing to **Webpage Signage Runner**! This 
 
 ## License
 By contributing to Webpage Signage Runner, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+
+---
+
+## Author & Maintainer
+
+Created and maintained with ❤️ by [**Maximiliano Contartesi**](https://github.com/mcontartesi).
+- 💼 **LinkedIn:** [maxiconta](https://www.linkedin.com/in/maxiconta/)
+- 🐙 **GitHub:** [@mcontartesi](https://github.com/mcontartesi)
+- ✉️ **Email / Contact:** maxiconta [at] gmail [dot] com
+- 📝 **Medium:** [@maxiconta](https://medium.com/@maxiconta)

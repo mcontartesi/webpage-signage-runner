@@ -6,9 +6,14 @@ export const OPENAPI_SPEC = {
     title: `${APP_TITLE} Control & Health API`,
     version: APP_VERSION,
     description: `### Production-grade Multi-Display Digital Signage Kiosk Orchestrator API
-Created by **${APP_AUTHOR}**.
+Created and maintained with ❤️ by [**${APP_AUTHOR}**](https://github.com/mcontartesi).
 
-This embedded HTTP REST API provides remote monitoring, dynamic URL push, display screenshot capture, and cache reloading without physical keyboard access.
+* 💼 **LinkedIn:** [maxiconta](https://www.linkedin.com/in/maxiconta/)
+* 🐙 **GitHub:** [@mcontartesi](https://github.com/mcontartesi)
+* ✉️ **Email / Contact:** maxiconta [at] gmail [dot] com
+* 📝 **Medium:** [@maxiconta](https://medium.com/@maxiconta)
+
+This embedded HTTP REST API provides remote monitoring, dynamic URL push (supporting GET/POST/PUT, Bearer tokens, and custom headers), display screenshot capture, and cache reloading without physical keyboard access.
 
 #### Authentication
 If configured with an API token, include either:
@@ -161,11 +166,32 @@ If configured with an API token, include either:
                     type: 'string',
                     format: 'uri',
                     description: 'Target webpage URL to load immediately',
-                    example: 'https://emergency.company.internal/alert',
+                    example: 'https://www.youtube.com',
+                  },
+                  httpMethod: {
+                    type: 'string',
+                    enum: ['GET', 'POST', 'PUT'],
+                    default: 'GET',
+                    description: 'HTTP request method for navigating the display',
+                    example: 'GET',
+                  },
+                  headers: {
+                    type: 'object',
+                    additionalProperties: { type: 'string' },
+                    description: 'Custom HTTP headers (e.g. Bearer token, custom secrets)',
+                    example: {
+                      Authorization: 'Bearer secret-kiosk-token-xyz',
+                      'X-Custom-Secret': 'my-secure-secret-key',
+                    },
+                  },
+                  requestBody: {
+                    type: 'string',
+                    description: 'Raw request payload body for POST / PUT methods',
+                    example: '{"stationId": 101, "mode": "active"}',
                   },
                   persist: {
                     type: 'boolean',
-                    description: 'If true, persists the URL change to config.json for subsequent reboots',
+                    description: 'If true, persists the URL and header changes to config.json for subsequent reboots',
                     default: false,
                     example: true,
                   },
@@ -448,7 +474,14 @@ If configured with an API token, include either:
         properties: {
           id: { type: 'integer', example: 1 },
           label: { type: 'string', example: 'Main Entrance Display' },
-          url: { type: 'string', format: 'uri', example: 'https://grafana.company.internal/kiosk' },
+          url: { type: 'string', format: 'uri', example: 'https://www.youtube.com' },
+          httpMethod: { type: 'string', enum: ['GET', 'POST', 'PUT'], default: 'GET', example: 'GET' },
+          headers: {
+            type: 'object',
+            additionalProperties: { type: 'string' },
+            example: { Authorization: 'Bearer sample-token' },
+          },
+          requestBody: { type: 'string', example: '' },
           fallbackUrl: { type: 'string', example: '' },
           reloadIntervalMinutes: { type: 'number', default: 60, example: 60 },
           retryIntervalSeconds: { type: 'number', default: 10, example: 10 },
@@ -461,7 +494,7 @@ If configured with an API token, include either:
         type: 'object',
         properties: {
           version: { type: 'string', example: '1.0.0' },
-          defaultUrl: { type: 'string', example: 'https://antigravity.google' },
+          defaultUrl: { type: 'string', example: 'https://www.youtube.com' },
           hideCursorGlobal: { type: 'boolean', example: true },
           defaultReloadIntervalMinutes: { type: 'number', example: 60 },
           defaultRetryIntervalSeconds: { type: 'number', example: 10 },

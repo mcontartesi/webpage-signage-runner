@@ -23,12 +23,22 @@ describe('ConfigManager & Zod Schema', () => {
   it('should validate valid DisplayConfig with defaults', () => {
     const validDisplay = {
       id: 1,
-      url: 'https://example.com/signage',
+      url: 'https://www.youtube.com',
+      httpMethod: 'POST' as const,
+      headers: {
+        Authorization: 'Bearer test-token',
+        'X-Custom-Secret': 'secret-value',
+      },
+      requestBody: '{"test": true}',
     };
 
     const parsed = DisplayConfigSchema.parse(validDisplay);
     expect(parsed.id).toBe(1);
-    expect(parsed.url).toBe('https://example.com/signage');
+    expect(parsed.url).toBe('https://www.youtube.com');
+    expect(parsed.httpMethod).toBe('POST');
+    expect(parsed.headers?.Authorization).toBe('Bearer test-token');
+    expect(parsed.headers?.['X-Custom-Secret']).toBe('secret-value');
+    expect(parsed.requestBody).toBe('{"test": true}');
     expect(parsed.reloadIntervalMinutes).toBe(60);
     expect(parsed.retryIntervalSeconds).toBe(10);
     expect(parsed.hideCursor).toBe(true);
@@ -48,7 +58,7 @@ describe('ConfigManager & Zod Schema', () => {
   it('should validate complete SignageConfigSchema', () => {
     const rawConfig = {
       version: '1.0.0',
-      defaultUrl: 'https://antigravity.google',
+      defaultUrl: 'https://www.youtube.com',
       autoStartOnBoot: true,
       api: {
         port: 9191,
@@ -81,6 +91,7 @@ describe('ConfigManager & Zod Schema', () => {
         {
           id: 1,
           url: 'https://google.com/feed',
+          httpMethod: 'GET',
           reloadIntervalMinutes: 45,
           retryIntervalSeconds: 12,
           hideCursor: true,

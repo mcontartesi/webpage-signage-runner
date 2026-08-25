@@ -175,18 +175,27 @@ curl -X POST http://localhost:9191/api/displays/2/reload \
 - **Body:**
   ```json
   {
-    "url": "https://emergency.company.com/alert-mode",
+    "url": "https://www.youtube.com",
+    "httpMethod": "GET",
+    "headers": {
+      "Authorization": "Bearer sample-token",
+      "X-Custom-Secret": "station-alpha"
+    },
+    "requestBody": "{\"kioskId\": 1, \"active\": true}",
     "persist": false
   }
   ```
-  - `url` (*string, required*): The new URL to navigate to immediately.
-  - `persist` (*boolean, optional, default: false*): If `true`, saves the updated URL to `config.json` so it persists across reboots.
+  - `url` (*string, required*): The new URL to navigate to immediately (e.g. `https://www.youtube.com`).
+  - `httpMethod` (*string, optional, default: "GET"*): HTTP method (`GET`, `POST`, `PUT`).
+  - `headers` (*object, optional*): Custom HTTP headers (Bearer token, secrets, content-type).
+  - `requestBody` (*string, optional*): Payload body for POST/PUT requests.
+  - `persist` (*boolean, optional, default: false*): If `true`, saves the updated URL and settings to `config.json` so they persist across reboots.
 
 #### Response Example (`200 OK`)
 ```json
 {
   "success": true,
-  "message": "Display #1 target URL updated to https://emergency.company.com/alert-mode"
+  "message": "Display #1 target URL updated to [GET] https://www.youtube.com"
 }
 ```
 
@@ -211,3 +220,13 @@ curl -X POST http://localhost:9191/api/displays/2/reload \
 ### 9. Get & Update Configuration
 - **`GET /api/config`**: Returns sanitized active configuration.
 - **`POST /api/config`**: Accepts partial or full JSON configuration, writes atomically to `config.json`, and applies changes live across all running displays.
+
+---
+
+## About & Author Credits
+
+Webpage Signage Runner is created and maintained with ❤️ by [**Maximiliano Contartesi**](https://github.com/mcontartesi).
+- 💼 **LinkedIn:** [maxiconta](https://www.linkedin.com/in/maxiconta/)
+- 🐙 **GitHub:** [@mcontartesi](https://github.com/mcontartesi)
+- ✉️ **Email / Contact:** maxiconta [at] gmail [dot] com
+- 📝 **Medium:** [@maxiconta](https://medium.com/@maxiconta)

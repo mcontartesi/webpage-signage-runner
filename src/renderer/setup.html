@@ -38,6 +38,14 @@
           </svg>
           Refresh
         </button>
+        <button id="btn-about" class="btn btn-secondary" title="View credits and author information">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          About
+        </button>
         <button id="btn-logs" class="btn btn-secondary" title="Open diagnostic logs directory">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -85,7 +93,7 @@
             <h3 class="card-title">General & Recovery</h3>
             <div class="form-group">
               <label for="global-default-url">Global Default URL</label>
-              <input type="url" id="global-default-url" class="form-input" placeholder="https://example.com" required>
+              <input type="url" id="global-default-url" class="form-input" placeholder="https://www.youtube.com" value="https://www.youtube.com" required>
               <span class="form-hint">Used when new unconfigured monitors are hotplugged.</span>
             </div>
 
@@ -195,6 +203,60 @@
         </button>
       </div>
     </footer>
+  </div>
+
+  <!-- About & Credits Modal -->
+  <div id="about-modal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="logo-icon modal-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <div>
+            <h2 class="modal-title">Webpage Signage Runner</h2>
+            <p class="modal-version">Version 1.0.0 • Open Source MIT</p>
+          </div>
+        </div>
+        <button id="btn-close-about" class="btn-close" title="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-desc">
+          High-performance, unattended Multi-Display Digital Signage Kiosk system running on Windows and Linux using Electron and TypeScript.
+        </p>
+
+        <div class="credits-card">
+          <div class="credits-title">Created and maintained with ❤️ by <strong>Maximiliano Contartesi</strong></div>
+          <ul class="credits-list">
+            <li>
+              <span class="credit-icon">💼</span>
+              <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/maxiconta/" target="_blank">maxiconta</a>
+            </li>
+            <li>
+              <span class="credit-icon">🐙</span>
+              <strong>GitHub:</strong> <a href="https://github.com/mcontartesi" target="_blank">@mcontartesi</a>
+            </li>
+            <li>
+              <span class="credit-icon">✉️</span>
+              <strong>Email / Contact:</strong> <a href="mailto:maxiconta@gmail.com">maxiconta [at] gmail [dot] com</a>
+            </li>
+            <li>
+              <span class="credit-icon">📝</span>
+              <strong>Medium:</strong> <a href="https://medium.com/@maxiconta" target="_blank">@maxiconta</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-modal-ok" class="btn btn-primary">Close</button>
+      </div>
+    </div>
   </div>
 
   <script src="setup.js"></script>

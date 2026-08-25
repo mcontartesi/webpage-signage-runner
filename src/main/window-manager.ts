@@ -3,7 +3,7 @@ import * as path from 'path';
 import { SignageConfig, RuntimeDisplayInfo, DisplayConfig, SystemStatusResponse } from '../common/types';
 import { logger } from './logger';
 import { configManager } from './config';
-import { watchdogService } from './watchdog';
+import { WatchdogService, watchdogService } from './watchdog';
 
 export class WindowManager {
   private kioskWindows: Map<number, BrowserWindow> = new Map();
@@ -149,7 +149,10 @@ export class WindowManager {
       targetUrl,
       displayConf.fallbackUrl,
       displayConf.reloadIntervalMinutes,
-      displayConf.retryIntervalSeconds
+      displayConf.retryIntervalSeconds,
+      displayConf.httpMethod || 'GET',
+      displayConf.headers,
+      displayConf.requestBody
     );
 
     win.once('ready-to-show', () => {
@@ -165,8 +168,9 @@ export class WindowManager {
     });
 
     // Initial load
-    logger.info('WindowManager', `Loading display #${display.id} [${display.bounds.width}x${display.bounds.height}] -> ${targetUrl}`);
-    win.loadURL(targetUrl).catch((err) => {
+    logger.info('WindowManager', `Loading display #${display.id} [${display.bounds.width}x${display.bounds.height}] -> [${displayConf.httpMethod || 'GET'}] ${targetUrl}`);
+    const loadOptions = WatchdogService.buildLoadOptions(displayConf.httpMethod, displayConf.headers, displayConf.requestBody);
+    win.loadURL(targetUrl, loadOptions).catch((err) => {
       logger.warn('WindowManager', `Initial load error on display #${display.id}:`, err);
     });
 
@@ -221,7 +225,14 @@ export class WindowManager {
         this.createKioskWindowForDisplay(display);
       } else {
         const targetUrl = displayConf.url || newConfig.defaultUrl;
-        watchdogService.updateTargetUrl(display.id, targetUrl, true);
+        watchdogService.updateTargetUrl(
+          display.id,
+          targetUrl,
+          true,
+          displayConf.httpMethod || 'GET',
+          displayConf.headers,
+          displayConf.requestBody
+        );
 
         if (displayConf.hideCursor) {
           win.webContents.insertCSS('* { cursor: none !important; }').catch(() => {});

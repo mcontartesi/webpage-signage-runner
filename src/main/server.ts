@@ -260,23 +260,43 @@ export class HttpServer {
       const displayUrlMatch = pathname.match(/^\/api\/displays\/([^/]+)\/url$/);
       if (displayUrlMatch && method === 'POST') {
         const displayId = Number(displayUrlMatch[1]);
-        const body = await this.parseBody<{ url: string; persist?: boolean }>(req);
+        const body = await this.parseBody<{
+          url: string;
+          httpMethod?: 'GET' | 'POST' | 'PUT';
+          headers?: Record<string, string>;
+          requestBody?: string;
+          persist?: boolean;
+        }>(req);
+
         if (!body.url) {
           return this.sendError(res, 400, 'Missing "url" parameter in JSON body');
         }
 
-        const success = watchdogService.updateTargetUrl(displayId, body.url, true);
+        const success = watchdogService.updateTargetUrl(
+          displayId,
+          body.url,
+          true,
+          body.httpMethod || 'GET',
+          body.headers,
+          body.requestBody
+        );
+
         if (!success) {
           return this.sendError(res, 404, `Display with ID ${displayId} not found`);
         }
 
         if (body.persist) {
-          configManager.updateDisplayConfig(displayId, { url: body.url });
+          configManager.updateDisplayConfig(displayId, {
+            url: body.url,
+            httpMethod: body.httpMethod || 'GET',
+            headers: body.headers,
+            requestBody: body.requestBody,
+          });
         }
 
         return this.sendJson(res, 200, {
           success: true,
-          message: `Display #${displayId} target URL updated to ${body.url}`,
+          message: `Display #${displayId} target URL updated to [${body.httpMethod || 'GET'}] ${body.url}`,
         } as ActionResponse);
       }
 

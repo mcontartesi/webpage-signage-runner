@@ -14,9 +14,11 @@
   <a href="#key-features">Key Features</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#first-run-wizard">First-Run Wizard</a> •
-  <a href="#configuration">Configuration</a> •
-  <a href="#remote-http-api">Remote HTTP API</a> •
+  <a href="#advanced-http-requests--authentication">HTTP & Auth</a> •
+  <a href="#configuration-configjson">Configuration</a> •
+  <a href="#remote-http-rest-api--swagger-ui">REST API & Swagger</a> •
   <a href="#resilience--watchdog">Watchdog</a> •
+  <a href="#about--credits">About & Credits</a> •
   <a href="#guía-en-español">Español</a>
 </p>
 
@@ -28,13 +30,14 @@
 
 - **Dynamic Multi-Display Orchestration**: Automatically enumerates all connected physical screens (`screen.getAllDisplays()`) and pins independent, borderless, always-on-top kiosk windows to each screen's exact coordinates.
 - **Dynamic Hot-Plugging**: Seamlessly reacts to monitor connection and disconnection events (`display-added`, `display-removed`) without crashing or restarting the application.
-- **First-Run Dark Mode Setup Wizard**: If no configuration exists, boots into an intuitive dark-mode setup wizard to discover screens, assign URLs, configure zoom levels, and test connectivity.
+- **First-Run Dark Mode Setup Wizard**: If no configuration exists, boots into an intuitive dark-mode setup wizard to discover screens, assign URLs (such as `https://www.youtube.com`, live dashboards, or internal web apps), configure zoom levels, and test connectivity.
+- **Advanced HTTP Requests & Authentication**: Supports `GET`, `POST`, and `PUT` request methods per display, allowing you to inject custom HTTP headers (such as `Authorization: Bearer <token>`, `X-Api-Key`, custom secrets) and raw request payloads into the initial and reload requests.
 - **Visual Screen Identification**: Flashes prominent screen index overlay numbers on all physical monitors at the click of a button so installers know exactly which monitor is which.
 - **Self-Healing Process Watchdog**:
   - Automatically intercepts network/loading failures and transitions to a branded **Offline Fallback UI** with live countdown timer and auto-retry loop.
   - Automatically restarts/recovers renderers on `unresponsive` or `render-process-gone` (crashes / OOM).
   - Performs scheduled background cache purges (`reloadIntervalMinutes`) to eliminate Chromium 24/7 memory leaks.
-- **Embedded HTTP REST & Health API**: Integrated local server (default port `9191`) for health checks (`/health`), system status (`/api/status`), remote reloads, dynamic URL changes, and live screenshot captures.
+- **Embedded HTTP REST & Health API with Swagger UI**: Integrated local server (default port `9191`) for health checks (`/health`), system status (`/api/status`), remote reloads, dynamic URL changes, live screenshot captures, and interactive Swagger UI documentation at `http://localhost:9191/`.
 - **OS Integration & Polishing**:
   - Prevents system sleep and monitor standby using `electron.powerSaveBlocker`.
   - Automatic mouse cursor suppression via CSS injection (`* { cursor: none !important; }`).
@@ -125,11 +128,33 @@ When launching without an existing `config.json` file:
 1. The application opens the **Dark-Mode Setup Wizard**.
 2. All connected displays are enumerated with resolution, refresh rate, and coordinates.
 3. Click **"Identify Screens"** to flash large numbers on every screen.
-4. Input the desired target URL for each display (e.g. dashboards, Grafana, PowerBI, video walls).
-5. Click **"Save & Launch Kiosk Mode"** to save `config.json` atomically and start running immediately.
+4. Input the desired target URL for each display (e.g. `https://www.youtube.com`, dashboards, Grafana, PowerBI, video walls).
+5. (Optional) Expand **"Advanced HTTP Request Options"** to configure `GET`/`POST`/`PUT` methods, custom headers (`Authorization: Bearer <token>`), or request body payloads.
+6. Click **"Save & Launch Kiosk Mode"** to save `config.json` atomically and start running immediately.
 
 > [!TIP]
 > **Emergency Recovery Shortcut:** Press **`Ctrl + Shift + C`** (or **`CmdOrCtrl + Alt + S`**) at any time on the physical keyboard to unlock the kiosk and reopen the Setup Wizard.
+
+---
+
+## Advanced HTTP Requests & Authentication
+
+Webpage Signage Runner allows configuring rich HTTP request parameters per display:
+- **HTTP Methods**: Support for `GET`, `POST`, and `PUT`.
+- **Custom Headers**: Pass Authorization tokens (Bearer, Basic, API keys) or custom corporate secrets:
+  ```http
+  Authorization: Bearer secret-kiosk-token-12345
+  X-Custom-Station-Secret: entrance-kiosk-alpha
+  Content-Type: application/json
+  ```
+- **Request Body**: Send raw JSON or form-encoded payloads for POST and PUT feeds:
+  ```json
+  {
+    "stationId": 1,
+    "kioskMode": true,
+    "theme": "dark"
+  }
+  ```
 
 ---
 
@@ -143,7 +168,7 @@ Configurations are saved under `app.getPath('userData')/config.json`:
 ```json
 {
   "version": "1.0.0",
-  "defaultUrl": "https://antigravity.google",
+  "defaultUrl": "https://www.youtube.com",
   "hideCursorGlobal": true,
   "defaultReloadIntervalMinutes": 60,
   "defaultRetryIntervalSeconds": 10,
@@ -153,7 +178,7 @@ Configurations are saved under `app.getPath('userData')/config.json`:
     "enabled": true,
     "port": 9191,
     "host": "0.0.0.0",
-    "authToken": "",
+    "authToken": "signage-secret-token-12345",
     "cors": true
   },
   "watchdog": {
@@ -165,12 +190,33 @@ Configurations are saved under `app.getPath('userData')/config.json`:
   "displays": [
     {
       "id": 1,
-      "label": "Lobby 4K Display",
-      "url": "https://grafana.internal/d/lobby-metrics?kiosk",
+      "label": "Lobby Main Video Wall (YouTube Live Feed)",
+      "url": "https://www.youtube.com",
+      "httpMethod": "GET",
+      "headers": {
+        "Authorization": "Bearer sample-token",
+        "X-Custom-Secret": "secret-123"
+      },
       "reloadIntervalMinutes": 60,
       "retryIntervalSeconds": 10,
       "hideCursor": true,
       "zoomFactor": 1.0,
+      "enabled": true
+    },
+    {
+      "id": 2,
+      "label": "Internal Metrics Feed (POST)",
+      "url": "https://dashboard.company.internal/kiosk",
+      "httpMethod": "POST",
+      "headers": {
+        "Authorization": "Bearer metrics-token-9988",
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{\"stationId\": 2, \"kioskMode\": true}",
+      "reloadIntervalMinutes": 120,
+      "retryIntervalSeconds": 15,
+      "hideCursor": true,
+      "zoomFactor": 1.25,
       "enabled": true
     }
   ]
@@ -194,7 +240,7 @@ Webpage Signage Runner features an embedded HTTP server (port `9191` by default)
 | `GET` | `/api/status` | Complete node telemetry, uptime, memory, and display states |
 | `POST` | `/api/reload` | Triggers immediate cache clear & reload on all screens |
 | `POST` | `/api/displays/:id/reload` | Reloads a specific screen |
-| `POST` | `/api/displays/:id/url` | Pushes a new URL to a display live (optional `{"persist": true}`) |
+| `POST` | `/api/displays/:id/url` | Pushes a new URL, method, headers, or body live |
 | `GET` | `/api/displays/:id/screenshot` | Captures an instant PNG screenshot of what the screen is displaying |
 | `POST` | `/api/identify` | Flashes screen identification numbers across all monitors |
 | `POST` | `/api/setup` | Opens the Setup Wizard remotely |
@@ -218,23 +264,37 @@ For step-by-step instructions on setting up Windows AutoLogon, Windows Shell Lau
 
 ---
 
+## About & Credits
+
+**Webpage Signage Runner** was designed and engineered by **Maximiliano Contartesi**, a Principal Software Engineer and Solutions Architect specialized in high-availability desktop applications, Node.js, TypeScript, and Electron kiosk architecture.
+
+Created and maintained with ❤️ by [**Maximiliano Contartesi**](https://github.com/mcontartesi).
+
+- 💼 **LinkedIn:** [maxiconta](https://www.linkedin.com/in/maxiconta/)
+- 🐙 **GitHub:** [@mcontartesi](https://github.com/mcontartesi)
+- ✉️ **Email / Contact:** maxiconta [at] gmail [dot] com
+- 📝 **Medium:** [@maxiconta](https://medium.com/@maxiconta)
+
+---
+
 ## Guía en Español
 
 ### Descripción General
-**Webpage Signage Runner** es un sistema de cartelería digital multi-pantalla desatendido y de grado de producción para Windows y Linux, creado como software de código abierto por **Maximiliano Contartesi**.
+**Webpage Signage Runner** es un sistema de cartelería digital multi-pantalla desatendido y de grado de producción para Windows y Linux, diseñado y desarrollado como software de código abierto por **Maximiliano Contartesi** (arquitecto de software y especialista en TypeScript y Electron).
 
 ### Características Principales
 1. **Gestión Dinámica Multi-Monitor**: Detecta automáticamente todas las pantallas físicas conectadas y proyecta ventanas independientes sin bordes en modo Kiosk fijadas a las coordenadas exactas de cada pantalla.
-2. **Soporte Hot-Plug**: Maneja la conexión y desconexión de pantallas en caliente sin reiniciar la aplicación.
-3. **Asistente de Configuración Inicial (Dark Mode)**: Si no existe configuración previa, inicia un asistente visual para identificar monitores, probar URLs y configurar parámetros.
-4. **Identificación Visual de Pantallas**: Muestra números gigantes en cada monitor al presionar "Identify Screens" para facilitar la instalación física.
-5. **Watchdog y Autorecuperación**:
+2. **Soporte de URLs y Métodos HTTP Avanzados**: Configura URLs objetivo (como `https://www.youtube.com`, dashboards o paneles de control) permitiendo peticiones `GET`, `POST` y `PUT` con cabeceras personalizadas (`Authorization: Bearer <token>`, claves de API, secretos) y cuerpo de datos (payload JSON).
+3. **Soporte Hot-Plug**: Maneja la conexión y desconexión de pantallas en caliente sin reiniciar la aplicación.
+4. **Asistente de Configuración Inicial (Dark Mode)**: Si no existe configuración previa, inicia un asistente visual para identificar monitores, probar URLs y configurar parámetros.
+5. **Identificación Visual de Pantallas**: Muestra números gigantes en cada monitor al presionar "Identify Screens" para facilitar la instalación física.
+6. **Watchdog y Autorecuperación**:
    - Detecta fallos de red y muestra una pantalla offline con temporizador de reintento automático.
    - Recupera procesos colgados o caídos por falta de memoria (OOM).
    - Limpia periódicamente la caché de Chromium para evitar fugas de memoria en funcionamiento 24/7.
-6. **API HTTP REST Embebida con Swagger UI (Puerto 9191)**: Permite monitoreo de estado, cambios remotos de URL, capturas de pantalla y reinicio. Incluye interfaz interactiva Swagger UI en `http://<ip>:9191/` (o `/docs`) para explorar y probar endpoints en vivo.
-7. **Arranque Automático con el Sistema**: Configuración integrada para iniciar junto con Windows o Linux.
-8. **Atajo de Emergencia**: Presiona **`Ctrl + Shift + C`** o **`CmdOrCtrl + Alt + S`** para salir del modo kiosk y abrir la configuración.
+7. **API HTTP REST Embebida con Swagger UI (Puerto 9191)**: Permite monitoreo de estado, cambios remotos de URL, capturas de pantalla y reinicio. Incluye interfaz interactiva Swagger UI en `http://<ip>:9191/` (o `/docs`) para explorar y probar endpoints en vivo.
+8. **Arranque Automático con el Sistema**: Configuración integrada para iniciar junto con Windows o Linux.
+9. **Atajo de Emergencia**: Presiona **`Ctrl + Shift + C`** o **`CmdOrCtrl + Alt + S`** para salir del modo kiosk y abrir la configuración.
 
 ---
 
@@ -242,4 +302,4 @@ For step-by-step instructions on setting up Windows AutoLogon, Windows Shell Lau
 
 Distributed under the **MIT License**. See [LICENSE](LICENSE) for more information.
 
-Created by **Maximiliano Contartesi**.
+Created and maintained by **Maximiliano Contartesi**.
