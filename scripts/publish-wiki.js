@@ -2,16 +2,31 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+function getWikiGitUrl() {
+  try {
+    const originUrl = execSync('git config --get remote.origin.url', { encoding: 'utf8' }).trim();
+    if (originUrl) {
+      if (originUrl.endsWith('.git')) {
+        return originUrl.replace(/\.git$/, '.wiki.git');
+      }
+      return `${originUrl}.wiki.git`;
+    }
+  } catch {
+    // fallback
+  }
+  return 'https://github.com/mcontartesi/webpage-signage-runner.wiki.git';
+}
+
+const WIKI_GIT_URL = getWikiGitUrl();
 const REPO_NAME = 'mcontartesi/webpage-signage-runner';
-const WIKI_GIT_URL = `https://github.com/${REPO_NAME}.wiki.git`;
 const WIKI_DIR = path.join(__dirname, '..', 'wiki');
 const TEMP_CLONE_DIR = path.join(__dirname, '..', '.wiki-publish-temp');
 
 async function main() {
-  console.log('🚀 Publishing documentation to GitHub Wiki...');
+  console.log('🚀 Publicando documentación en la Wiki de GitHub / Publishing to GitHub Wiki...');
 
   if (!fs.existsSync(WIKI_DIR)) {
-    console.error(`❌ Error: Wiki directory not found at ${WIKI_DIR}`);
+    console.error(`❌ Error: Directorio de Wiki no encontrado en / Wiki directory not found at: ${WIKI_DIR}`);
     process.exit(1);
   }
 
@@ -21,20 +36,21 @@ async function main() {
   }
 
   try {
-    console.log(`📡 Connecting to GitHub Wiki git repository (${WIKI_GIT_URL})...`);
-    execSync(`git clone ${WIKI_GIT_URL} "${TEMP_CLONE_DIR}"`, { stdio: 'pipe' });
+    console.log(`📡 Conectando al repositorio Git de la Wiki: ${WIKI_GIT_URL}...`);
+    execSync(`git clone "${WIKI_GIT_URL}" "${TEMP_CLONE_DIR}"`, { stdio: 'pipe' });
   } catch (err) {
-    console.warn('\n⚠️  Could not clone wiki repository automatically.');
-    console.warn('👉 Note: On GitHub, you must initialize the wiki first:');
-    console.warn(`   1. Visit https://github.com/${REPO_NAME}/wiki`);
-    console.warn('   2. Click "Create the first page" and click "Save page" (can be empty or "Home").');
-    console.warn('   3. Run "npm run wiki:publish" again.\n');
-    console.error('Git error output:', err.message);
+    console.warn('\n⚠️  No se pudo clonar el repositorio de la Wiki automáticamente.');
+    console.warn('👉 En GitHub, el repositorio Git de la Wiki solo se crea tras guardar la primera página en la web:');
+    console.warn('   1. Abre en tu navegador: https://github.com/' + REPO_NAME + '/wiki');
+    console.warn('   2. Haz clic en el botón verde "Create the first page" (Crear la primera página).');
+    console.warn('   3. Haz clic abajo en el botón verde "Save page" (Guardar página).');
+    console.warn('   4. Vuelve a ejecutar: npm run wiki:publish\n');
+    console.error('Detalle del error de Git:', err.message);
     process.exit(1);
   }
 
   try {
-    console.log('📋 Copying wiki pages...');
+    console.log('📋 Copiando páginas de documentación...');
     const files = fs.readdirSync(WIKI_DIR);
     for (const file of files) {
       const srcFile = path.join(WIKI_DIR, file);
@@ -45,23 +61,22 @@ async function main() {
       }
     }
 
-    console.log('📦 Committing changes...');
+    console.log('📦 Creando commit...');
     execSync('git add .', { cwd: TEMP_CLONE_DIR });
     
-    // Check if there are changes
     const status = execSync('git status --porcelain', { cwd: TEMP_CLONE_DIR }).toString().trim();
     if (!status) {
-      console.log('✨ Wiki is already up-to-date. No changes to push.');
+      console.log('✨ La Wiki ya está actualizada. No hay cambios pendientes.');
       return;
     }
 
-    execSync('git commit -m "Update documentation and wiki pages"', { cwd: TEMP_CLONE_DIR });
-    console.log('⬆️  Pushing to GitHub Wiki...');
+    execSync('git commit -m "Update documentation, guides and sidebar navigation"', { cwd: TEMP_CLONE_DIR });
+    console.log('⬆️  Subiendo cambios a la Wiki de GitHub...');
     execSync('git push origin master', { cwd: TEMP_CLONE_DIR, stdio: 'inherit' });
-    console.log('✅ GitHub Wiki published successfully!');
-    console.log(`🔗 View at: https://github.com/${REPO_NAME}/wiki`);
+    console.log('✅ ¡Wiki de GitHub publicada con éxito!');
+    console.log(`🔗 Ver en: https://github.com/${REPO_NAME}/wiki`);
   } catch (err) {
-    console.error('❌ Error updating wiki:', err.message);
+    console.error('❌ Error al actualizar la Wiki:', err.message);
     process.exit(1);
   } finally {
     if (fs.existsSync(TEMP_CLONE_DIR)) {
