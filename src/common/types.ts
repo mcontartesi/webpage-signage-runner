@@ -13,7 +13,7 @@ export const DisplayConfigSchema = z.object({
   /** HTTP method for the initial/reloading request (GET, POST, PUT) */
   httpMethod: z.enum(['GET', 'POST', 'PUT']).default('GET'),
   /** Custom HTTP headers (e.g. Authorization: Bearer <token>, X-Api-Key, etc.) */
-  headers: z.record(z.string()).optional(),
+  headers: z.record(z.string(), z.string()).optional(),
   /** Raw request body string for POST/PUT requests (JSON, XML, or form-urlencoded) */
   requestBody: z.string().optional(),
   /** Fallback URL or local asset path if primary URL fails permanently */
@@ -89,9 +89,19 @@ export const SignageConfigSchema = z.object({
   /** Emergency shortcut to exit kiosk or open setup (e.g. "CommandOrControl+Shift+C") */
   emergencyShortcut: z.string().default('CommandOrControl+Shift+C'),
   /** Embedded HTTP API settings */
-  api: ApiConfigSchema.default({}),
+  api: ApiConfigSchema.default({
+    enabled: true,
+    port: 9191,
+    host: '0.0.0.0',
+    cors: true,
+  }),
   /** Watchdog settings */
-  watchdog: WatchdogConfigSchema.default({}),
+  watchdog: WatchdogConfigSchema.default({
+    maxRetries: 10,
+    unresponsiveTimeoutSeconds: 15,
+    clearCacheOnReload: true,
+    autoRecoverCrashes: true,
+  }),
   /** Per-display settings keyed by display ID or list */
   displays: z.array(DisplayConfigSchema).default([]),
 });

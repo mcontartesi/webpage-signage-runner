@@ -37,7 +37,6 @@ X-GNOME-Autostart-enabled=true
       if (isWindows) {
         app.setLoginItemSettings({
           openAtLogin: enable,
-          openAsHidden: false,
           path: process.execPath,
           args: ['--autostart'],
         });
