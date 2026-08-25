@@ -32,13 +32,17 @@ class SetupController {
   private inputGlobalAutostart = document.getElementById('global-autostart') as HTMLInputElement;
   private inputGlobalHideCursor = document.getElementById('global-hide-cursor') as HTMLInputElement;
   private inputApiEnabled = document.getElementById('api-enabled') as HTMLInputElement;
+  private apiDependentFields = document.getElementById('api-dependent-fields') as HTMLDivElement;
   private inputApiPort = document.getElementById('api-port') as HTMLInputElement;
   private inputApiHost = document.getElementById('api-host') as HTMLInputElement;
   private inputApiToken = document.getElementById('api-token') as HTMLInputElement;
+  private btnToggleToken = document.getElementById('btn-toggle-token') as HTMLButtonElement;
   private inputWatchdogReload = document.getElementById('watchdog-reload-mins') as HTMLInputElement;
   private inputWatchdogRetry = document.getElementById('watchdog-retry-secs') as HTMLInputElement;
   private inputWatchdogClearCache = document.getElementById('watchdog-clear-cache') as HTMLInputElement;
   private inputWatchdogAutoRecover = document.getElementById('watchdog-auto-recover') as HTMLInputElement;
+
+  private toastTimeout: any = null;
 
   public async init(): Promise<void> {
     this.bindEvents();
@@ -47,7 +51,7 @@ class SetupController {
 
   private bindEvents(): void {
     this.btnIdentify.addEventListener('click', async () => {
-      this.showToast('Flashing monitor numbers on all displays...', 'success');
+      this.showToast('Flashing monitor numbers on all physical screens...', 'success');
       await window.signageAPI.identifyDisplays();
     });
 
@@ -82,13 +86,76 @@ class SetupController {
       });
     }
 
-    this.btnLogs.addEventListener('click', async () => {
-      await window.signageAPI.openLogsFolder();
+    if (this.btnLogs) {
+      this.btnLogs.addEventListener('click', async () => {
+        await window.signageAPI.openLogsFolder();
+      });
+    }
+
+    if (this.btnSave) {
+      this.btnSave.addEventListener('click', async () => {
+        await this.saveAndLaunch();
+      });
+    }
+
+    // Toggle API dependent fields visibility/state
+    if (this.inputApiEnabled) {
+      this.inputApiEnabled.addEventListener('change', () => {
+        this.updateApiFieldsState();
+      });
+    }
+
+    // Toggle API token password visibility
+    if (this.btnToggleToken && this.inputApiToken) {
+      this.btnToggleToken.addEventListener('click', () => {
+        const isPassword = this.inputApiToken.type === 'password';
+        this.inputApiToken.type = isPassword ? 'text' : 'password';
+        this.btnToggleToken.innerHTML = isPassword
+          ? `<svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+               <line x1="1" y1="1" x2="23" y2="23"></line>
+             </svg>`
+          : `<svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+               <circle cx="12" cy="12" r="3"></circle>
+             </svg>`;
+      });
+    }
+
+    // Click to copy API endpoint tags
+    document.querySelectorAll('.endpoint-tag').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const endpoint = (btn as HTMLElement).dataset.endpoint;
+        if (endpoint) {
+          navigator.clipboard.writeText(endpoint).then(() => {
+            this.showToast(`Copied ${endpoint} to clipboard`, 'success');
+          }).catch(() => {
+            this.showToast(`Endpoint: ${endpoint}`, 'success');
+          });
+        }
+      });
     });
 
-    this.btnSave.addEventListener('click', async () => {
-      await this.saveAndLaunch();
+    // Global keyboard shortcut: Ctrl+S / Cmd+S to save
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        this.saveAndLaunch();
+      }
+      if (e.key === 'Escape' && this.aboutModal && !this.aboutModal.classList.contains('hidden')) {
+        this.closeAboutModal();
+      }
     });
+  }
+
+  private updateApiFieldsState(): void {
+    if (this.apiDependentFields && this.inputApiEnabled) {
+      if (this.inputApiEnabled.checked) {
+        this.apiDependentFields.classList.remove('disabled');
+      } else {
+        this.apiDependentFields.classList.add('disabled');
+      }
+    }
   }
 
   private openAboutModal(): void {
@@ -125,6 +192,7 @@ class SetupController {
     this.inputApiPort.value = String(this.config.api?.port || 9191);
     this.inputApiHost.value = this.config.api?.host || '0.0.0.0';
     this.inputApiToken.value = this.config.api?.authToken || '';
+    this.updateApiFieldsState();
 
     this.inputWatchdogReload.value = String(this.config.defaultReloadIntervalMinutes ?? 60);
     this.inputWatchdogRetry.value = String(this.config.defaultRetryIntervalSeconds ?? 10);
@@ -172,7 +240,7 @@ class SetupController {
     if (this.displays.length === 0) {
       this.displaysContainer.innerHTML = `
         <div class="loading-state">
-          <p>No active displays detected. Please check display connections.</p>
+          <p>No active displays detected. Please check display physical connections.</p>
         </div>
       `;
       return;
@@ -200,7 +268,7 @@ class SetupController {
         <div class="display-card-top">
           <div class="display-info">
             <div class="display-badge-number">${index + 1}</div>
-            <div>
+            <div class="display-headings">
               <div class="display-label">${display.label || `Display #${display.id}`}</div>
               <div class="display-meta">${display.bounds.width} × ${display.bounds.height} @ (${display.bounds.x}, ${display.bounds.y}) • Scale: ${display.scaleFactor}x</div>
             </div>
@@ -211,22 +279,25 @@ class SetupController {
           </div>
         </div>
 
-        <div class="form-group" style="margin-bottom: 12px;">
+        <div class="form-group">
           <label for="url-${display.id}">Target Signage URL</label>
           <div class="form-input-group">
-            <input type="url" id="url-${display.id}" class="form-input display-url-input" value="${targetUrl}" placeholder="https://www.youtube.com" required>
-            <button type="button" class="btn btn-secondary btn-small btn-test-url" data-target="url-${display.id}">Test</button>
+            <input type="url" id="url-${display.id}" class="form-input font-mono display-url-input" value="${targetUrl}" placeholder="https://www.youtube.com" required>
+            <button type="button" class="btn btn-secondary btn-small btn-test-url" data-target="url-${display.id}" title="Test URL connectivity">Test</button>
           </div>
         </div>
 
-        <!-- Advanced HTTP Method & Custom Headers Section -->
+        <!-- Advanced HTTP Request Options Accordion -->
         <details class="details-advanced" ${httpMethod !== 'GET' || headersStr || requestBody ? 'open' : ''}>
           <summary>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
               <circle cx="12" cy="12" r="3"></circle>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
-            Advanced HTTP Request Options (GET/POST/PUT, Headers, Bearer Token)
+            <span>Advanced HTTP Options (Method, Headers, Payload)</span>
+            <svg class="summary-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
           </summary>
           <div class="details-content">
             <div class="form-row">
@@ -241,7 +312,7 @@ class SetupController {
             </div>
 
             <div class="form-group">
-              <label for="headers-${display.id}">Custom HTTP Headers (Bearer Token, Secrets)</label>
+              <label for="headers-${display.id}">Custom HTTP Headers (Auth Token, Headers)</label>
               <textarea id="headers-${display.id}" class="form-textarea display-headers-input" placeholder="Authorization: Bearer your-secret-token\nX-Custom-Auth: secret123">${headersStr}</textarea>
               <span class="form-hint">One header per line (<code>Header: Value</code>) or JSON format.</span>
             </div>
@@ -253,12 +324,12 @@ class SetupController {
           </div>
         </details>
 
-        <div class="form-group" style="margin-top: 12px; margin-bottom: 12px;">
+        <div class="form-group">
           <label for="fallback-${display.id}">Fallback Offline Asset / URL (Optional)</label>
-          <input type="text" id="fallback-${display.id}" class="form-input display-fallback-input" value="${fallbackUrl}" placeholder="file:///path/or/url">
+          <input type="text" id="fallback-${display.id}" class="form-input font-mono display-fallback-input" value="${fallbackUrl}" placeholder="file:///path/or/url">
         </div>
 
-        <div class="form-row" style="margin-bottom: 12px;">
+        <div class="form-row">
           <div class="form-group flex-1">
             <label for="reload-${display.id}">Reload (Mins)</label>
             <input type="number" id="reload-${display.id}" class="form-input display-reload-input" value="${reloadMins}" min="0">
@@ -273,21 +344,25 @@ class SetupController {
           </div>
         </div>
 
-        <div class="form-row" style="align-items: center; justify-content: space-between;">
-          <div class="form-checkbox-group">
-            <label class="checkbox-container">
+        <div class="display-card-footer">
+          <div class="toggle-row" style="padding: 0;">
+            <label class="toggle-switch">
               <input type="checkbox" id="cursor-${display.id}" class="display-cursor-input" ${hideCursor ? 'checked' : ''}>
-              <span class="checkmark"></span>
-              <span class="checkbox-label">Hide Cursor</span>
+              <span class="toggle-slider"></span>
             </label>
+            <div class="toggle-info">
+              <span class="toggle-title">Hide Cursor</span>
+            </div>
           </div>
 
-          <div class="form-checkbox-group">
-            <label class="checkbox-container">
+          <div class="toggle-row" style="padding: 0;">
+            <label class="toggle-switch">
               <input type="checkbox" id="enabled-${display.id}" class="display-enable-input" ${enabled ? 'checked' : ''}>
-              <span class="checkmark"></span>
-              <span class="checkbox-label">Enable Screen</span>
+              <span class="toggle-slider"></span>
             </label>
+            <div class="toggle-info">
+              <span class="toggle-title">Enable Screen</span>
+            </div>
           </div>
         </div>
       `;
@@ -297,20 +372,29 @@ class SetupController {
       const urlInput = card.querySelector('.display-url-input') as HTMLInputElement;
       testBtn.addEventListener('click', async () => {
         const val = urlInput.value.trim();
-        if (!val) return;
+        if (!val) {
+          this.showToast('Please enter a target URL before testing', 'error');
+          urlInput.focus();
+          return;
+        }
         testBtn.textContent = 'Testing...';
+        testBtn.disabled = true;
         const res = await window.signageAPI.testUrl(val);
+        testBtn.disabled = false;
         if (res.success) {
           testBtn.textContent = `OK (${res.data?.status || 200})`;
           testBtn.style.color = '#34d399';
+          testBtn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
         } else {
           testBtn.textContent = 'Failed';
           testBtn.style.color = '#f87171';
+          testBtn.style.borderColor = 'rgba(239, 68, 68, 0.4)';
         }
         setTimeout(() => {
           testBtn.textContent = 'Test';
           testBtn.style.color = '';
-        }, 3000);
+          testBtn.style.borderColor = '';
+        }, 3500);
       });
 
       // Enable/disable toggle
@@ -416,11 +500,14 @@ class SetupController {
   }
 
   private showToast(message: string, type: 'success' | 'error'): void {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
     this.statusToast.textContent = message;
     this.statusToast.className = `status-toast ${type}`;
-    setTimeout(() => {
+    this.toastTimeout = setTimeout(() => {
       this.statusToast.className = 'status-toast hidden';
-    }, 4000);
+    }, 4500);
   }
 }
 
