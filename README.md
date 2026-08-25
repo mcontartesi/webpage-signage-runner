@@ -4,6 +4,8 @@
 
 **Production-grade, unattended Multi-Display Digital Signage Kiosk orchestrator for Windows and Linux.**
 
+[![Latest Release](https://img.shields.io/github/v/release/mcontartesi/webpage-signage-runner?color=0ea5e9&label=Latest%20Version&logo=github)](https://github.com/mcontartesi/webpage-signage-runner/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/mcontartesi/webpage-signage-runner/total?color=success&logo=github)](https://github.com/mcontartesi/webpage-signage-runner/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Electron](https://img.shields.io/badge/Electron-44.0-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/)
@@ -11,8 +13,8 @@
 [![Open Source](https://img.shields.io/badge/Open%20Source-By%20Maximiliano%20Contartesi-0ea5e9)](https://github.com/mcontartesi)
 
 <p align="center">
+  <a href="#-quick-download--descargas-directas"><b>📥 Quick Download</b></a> •
   <a href="#key-features">Key Features</a> •
-  <a href="#quick-start">Quick Start</a> •
   <a href="#first-run-wizard">First-Run Wizard</a> •
   <a href="#advanced-http-requests--authentication">HTTP & Auth</a> •
   <a href="#configuration-configjson">Configuration</a> •
@@ -23,6 +25,46 @@
 </p>
 
 </div>
+
+---
+
+## 📥 Quick Download / Descargas Directas
+
+> **No technical knowledge or Node.js required!** Download the compiled standalone application for your operating system, double click, and start running your digital signage setup immediately.
+
+### 🪟 Windows (Windows 10 / 11 / Server)
+
+| Type | File | Description | Download |
+|---|---|---|---|
+| **Installer** | `Webpage-Signage-Runner-Setup-1.0.0-x64.exe` | Standard Windows Setup Wizard (with Desktop & Start Menu shortcuts, Autostart) | [⬇️ Download Installer](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Setup-1.0.0-x64.exe) |
+| **Portable** | `Webpage-Signage-Runner-Portable-1.0.0-x64.exe` | Standalone executable (runs directly from USB or folder, no installation required) | [⬇️ Download Portable](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Portable-1.0.0-x64.exe) |
+
+### 🐧 Linux (Ubuntu, Debian, Fedora, Arch, Raspberry Pi OS)
+
+| Package | File | Description | Download |
+|---|---|---|---|
+| **AppImage** | `webpage-signage-runner-1.0.0-x64.AppImage` | Universal Linux standalone binary (runs on all distributions) | [⬇️ Download AppImage](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.AppImage) |
+| **Debian / Ubuntu** | `webpage-signage-runner-1.0.0-x64.deb` | Native `.deb` package for Ubuntu, Debian, Linux Mint | [⬇️ Download .deb](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.deb) |
+| **Fedora / RHEL** | `webpage-signage-runner-1.0.0-x64.rpm` | Native `.rpm` package for Fedora, CentOS, Rocky Linux | [⬇️ Download .rpm](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.rpm) |
+| **Tarball** | `webpage-signage-runner-1.0.0-x64.tar.gz` | Portable tarball archive | [⬇️ Download .tar.gz](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.tar.gz) |
+
+👉 **[View all Releases and Version Changelog on GitHub Releases](https://github.com/mcontartesi/webpage-signage-runner/releases)**
+
+---
+
+## 🚀 How to Run in 3 Easy Steps (End-User Guide)
+
+1. **Download** the appropriate file above for your OS.
+2. **Launch** the app:
+   - On **Windows**: Double-click `Webpage-Signage-Runner-Setup-1.0.0-x64.exe` or `Webpage-Signage-Runner-Portable-1.0.0-x64.exe`.
+   - On **Linux AppImage**: Make it executable (`chmod +x webpage-signage-runner-*.AppImage`) and run it.
+3. **Configure & Launch**:
+   - The dark-mode setup wizard will automatically open on first boot.
+   - Enter your target URLs (e.g. `https://www.youtube.com`, Grafana dashboards, web apps).
+   - Click **"Save & Launch Kiosk Mode"** — the app immediately locks into fullscreen borderless kiosk mode across all physical monitors.
+
+> [!TIP]
+> **Emergency Unlock Hotkey:** Press **`Ctrl + Shift + C`** (or **`CmdOrCtrl + Alt + S`**) on any keyboard at any time to unlock the kiosk and bring up the Setup Wizard.
 
 ---
 
@@ -92,7 +134,7 @@ flowchart TD
 
 ---
 
-## Quick Start
+## Developer Quick Start
 
 ### 1. Prerequisites
 - [Node.js](https://nodejs.org/) v20.x or v22.x LTS
@@ -110,14 +152,17 @@ npm install
 npm run dev
 ```
 
-### 4. Production Build
+### 4. Build & Package
 ```bash
 # Build TypeScript and assets
 npm run build
 
-# Package installers
+# Package unpacked application
+npm run pack
+
+# Package platform installers
 npm run dist:win    # Windows NSIS & Portable .exe
-npm run dist:linux  # Linux AppImage & .deb
+npm run dist:linux  # Linux AppImage, .deb, .rpm
 ```
 
 ---
@@ -131,9 +176,6 @@ When launching without an existing `config.json` file:
 4. Input the desired target URL for each display (e.g. `https://www.youtube.com`, dashboards, Grafana, PowerBI, video walls).
 5. (Optional) Expand **"Advanced HTTP Request Options"** to configure `GET`/`POST`/`PUT` methods, custom headers (`Authorization: Bearer <token>`), or request body payloads.
 6. Click **"Save & Launch Kiosk Mode"** to save `config.json` atomically and start running immediately.
-
-> [!TIP]
-> **Emergency Recovery Shortcut:** Press **`Ctrl + Shift + C`** (or **`CmdOrCtrl + Alt + S`**) at any time on the physical keyboard to unlock the kiosk and reopen the Setup Wizard.
 
 ---
 
@@ -279,8 +321,12 @@ Created and maintained with ❤️ by [**Maximiliano Contartesi**](https://githu
 
 ## Guía en Español
 
-### Descripción General
-**Webpage Signage Runner** es un sistema de cartelería digital multi-pantalla desatendido y de grado de producción para Windows y Linux, diseñado y desarrollado como software de código abierto por **Maximiliano Contartesi** (arquitecto de software y especialista en TypeScript y Electron).
+### 📥 Descargas Rápidas (Para Usuarios Finales)
+No se requieren conocimientos técnicos de programación ni Node.js. Descarga el ejecutable para tu sistema operativo:
+- **Windows Instalador (`.exe`):** [Descargar Instalador](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Setup-1.0.0-x64.exe)
+- **Windows Portable (`.exe`):** [Descargar Portable](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Portable-1.0.0-x64.exe)
+- **Linux AppImage:** [Descargar AppImage](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.AppImage)
+- **Linux Debian / Ubuntu (`.deb`):** [Descargar .deb](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.deb)
 
 ### Características Principales
 1. **Gestión Dinámica Multi-Monitor**: Detecta automáticamente todas las pantallas físicas conectadas y proyecta ventanas independientes sin bordes en modo Kiosk fijadas a las coordenadas exactas de cada pantalla.

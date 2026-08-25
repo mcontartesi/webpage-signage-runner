@@ -12,6 +12,11 @@ files:
   - "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}"
   - "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}"
 
+publish:
+  provider: github
+  owner: mcontartesi
+  repo: webpage-signage-runner
+
 win:
   target:
     - target: nsis
@@ -21,7 +26,6 @@ win:
       arch:
         - x64
   icon: assets/icon.svg
-  artifactName: "${productName}-Setup-${version}-${arch}.${ext}"
 
 nsis:
   oneClick: false
@@ -29,6 +33,10 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: "Webpage Signage Runner"
+  artifactName: "Webpage-Signage-Runner-Setup-${version}-${arch}.${ext}"
+
+portable:
+  artifactName: "Webpage-Signage-Runner-Portable-${version}-${arch}.${ext}"
 
 linux:
   target:
@@ -49,7 +57,8 @@ linux:
         - arm64
   category: Utility
   executableName: webpage-signage-runner
-  maintainer: "Maximiliano Contartesi"
+  maintainer: "Maximiliano Contartesi <maxiconta@gmail.com>"
   synopsis: "Production-grade unattended Multi-Display Digital Signage Kiosk runner"
   description: "Cross-platform multi-display kiosk runner for unattended digital signage on Windows and Linux."
   icon: assets/icon.svg
+  artifactName: "${name}-${version}-${arch}.${ext}"
