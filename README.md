@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📺 Webpage Signage Runner
+# Webpage Signage Runner
 
 **Production-grade, unattended Multi-Display Digital Signage Kiosk orchestrator for Windows and Linux.**
 
@@ -24,18 +24,18 @@
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
-- 🖥️ **Dynamic Multi-Display Orchestration**: Automatically enumerates all connected physical screens (`screen.getAllDisplays()`) and pins independent, borderless, always-on-top kiosk windows to each screen's exact coordinates.
-- 🔌 **Dynamic Hot-Plugging**: Seamlessly reacts to monitor connection and disconnection events (`display-added`, `display-removed`) without crashing or restarting the application.
-- 🧙 **First-Run Dark Mode Setup Wizard**: If no configuration exists, boots into an intuitive dark-mode setup wizard to discover screens, assign URLs, configure zoom levels, and test connectivity.
-- 🚨 **Visual Screen Identification**: Flashes prominent screen index overlay numbers on all physical monitors at the click of a button so installers know exactly which monitor is which.
-- 🛡️ **Self-Healing Process Watchdog**:
+- **Dynamic Multi-Display Orchestration**: Automatically enumerates all connected physical screens (`screen.getAllDisplays()`) and pins independent, borderless, always-on-top kiosk windows to each screen's exact coordinates.
+- **Dynamic Hot-Plugging**: Seamlessly reacts to monitor connection and disconnection events (`display-added`, `display-removed`) without crashing or restarting the application.
+- **First-Run Dark Mode Setup Wizard**: If no configuration exists, boots into an intuitive dark-mode setup wizard to discover screens, assign URLs, configure zoom levels, and test connectivity.
+- **Visual Screen Identification**: Flashes prominent screen index overlay numbers on all physical monitors at the click of a button so installers know exactly which monitor is which.
+- **Self-Healing Process Watchdog**:
   - Automatically intercepts network/loading failures and transitions to a branded **Offline Fallback UI** with live countdown timer and auto-retry loop.
   - Automatically restarts/recovers renderers on `unresponsive` or `render-process-gone` (crashes / OOM).
   - Performs scheduled background cache purges (`reloadIntervalMinutes`) to eliminate Chromium 24/7 memory leaks.
-- 🌐 **Embedded HTTP REST & Health API**: Integrated local server (default port `9191`) for health checks (`/health`), system status (`/api/status`), remote reloads, dynamic URL changes, and live screenshot captures.
-- ⚡ **OS Integration & Polishing**:
+- **Embedded HTTP REST & Health API**: Integrated local server (default port `9191`) for health checks (`/health`), system status (`/api/status`), remote reloads, dynamic URL changes, and live screenshot captures.
+- **OS Integration & Polishing**:
   - Prevents system sleep and monitor standby using `electron.powerSaveBlocker`.
   - Automatic mouse cursor suppression via CSS injection (`* { cursor: none !important; }`).
   - Automatic startup on boot for Windows (LoginItems) and Linux (`.desktop` / `systemd`).
@@ -43,7 +43,7 @@
 
 ---
 
-## 🏛️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
@@ -89,7 +89,7 @@ flowchart TD
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Prerequisites
 - [Node.js](https://nodejs.org/) v20.x or v22.x LTS
@@ -119,7 +119,7 @@ npm run dist:linux  # Linux AppImage & .deb
 
 ---
 
-## 🧙 First-Run Wizard
+## First-Run Wizard
 
 When launching without an existing `config.json` file:
 1. The application opens the **Dark-Mode Setup Wizard**.
@@ -133,7 +133,7 @@ When launching without an existing `config.json` file:
 
 ---
 
-## ⚙️ Configuration (`config.json`)
+## Configuration (`config.json`)
 
 Configurations are saved under `app.getPath('userData')/config.json`:
 - **Windows:** `%APPDATA%/webpage-signage-runner/config.json`
@@ -179,7 +179,7 @@ Configurations are saved under `app.getPath('userData')/config.json`:
 
 ---
 
-## 📡 Remote HTTP REST API
+## Remote HTTP REST API
 
 Webpage Signage Runner features an embedded HTTP server (port `9191` by default) for remote monitoring and central management.
 
@@ -194,11 +194,11 @@ Webpage Signage Runner features an embedded HTTP server (port `9191` by default)
 | `POST` | `/api/identify` | Flashes screen identification numbers across all monitors |
 | `POST` | `/api/setup` | Opens the Setup Wizard remotely |
 
-👉 *For complete API documentation, headers, and `curl` examples, see [API.md](API.md).*
+For complete API documentation, headers, and `curl` examples, see [API.md](API.md).
 
 ---
 
-## 🛡️ Resilience & Watchdog
+## Resilience & Watchdog
 
 - **Network Failures:** In case of connection dropout, displays automatically render `offline.html` showing diagnostics and an animated countdown before retrying. When the OS network adapter reconnects (`navigator.onLine`), it reloads immediately.
 - **Renderer Crashes / OOM:** The watchdog listens to `render-process-gone` and `unresponsive` events to automatically reboot the crashed display window without requiring an OS restart.
@@ -207,13 +207,13 @@ Webpage Signage Runner features an embedded HTTP server (port `9191` by default)
 
 ---
 
-## 📖 Production Hardening
+## Production Hardening
 
 For step-by-step instructions on setting up Windows AutoLogon, Windows Shell Launcher, Linux systemd user services, and Wayland/X11 kiosk mode, please refer to the [Production Deployment Guide (DEPLOYMENT.md)](DEPLOYMENT.md).
 
 ---
 
-## 🇪🇸 Guía en Español
+## Guía en Español
 
 ### Descripción General
 **Webpage Signage Runner** es un sistema de cartelería digital multi-pantalla desatendido y de grado de producción para Windows y Linux, creado como software de código abierto por **Maximiliano Contartesi**.
@@ -233,8 +233,8 @@ For step-by-step instructions on setting up Windows AutoLogon, Windows Shell Lau
 
 ---
 
-## 📄 License
+## License
 
 Distributed under the **MIT License**. See [LICENSE](LICENSE) for more information.
 
-Created with ❤️ by **Maximiliano Contartesi**.
+Created by **Maximiliano Contartesi**.
