@@ -16,6 +16,7 @@ publish:
   provider: github
   owner: mcontartesi
   repo: webpage-signage-runner
+  releaseType: release
 
 win:
   target:

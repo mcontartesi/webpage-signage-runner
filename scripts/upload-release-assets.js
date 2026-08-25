@@ -54,8 +54,19 @@ async function main() {
     process.exit(1);
   }
 
+  const pkg = require('../package.json');
+  const version = pkg.version;
   const files = fs.readdirSync(releaseDir).filter((f) => {
-    return f.endsWith('.exe') || f.endsWith('.AppImage') || f.endsWith('.deb') || f.endsWith('.rpm') || f.endsWith('.blockmap') || f === 'latest.yml';
+    if (f === 'latest.yml' || f === 'latest-linux.yml') return true;
+    return (
+      f.includes(version) &&
+      (f.endsWith('.exe') ||
+        f.endsWith('.AppImage') ||
+        f.endsWith('.deb') ||
+        f.endsWith('.rpm') ||
+        f.endsWith('.blockmap') ||
+        f.endsWith('.tar.gz'))
+    );
   });
 
   for (const fileName of files) {
