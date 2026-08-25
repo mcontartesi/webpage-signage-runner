@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+release/
+.logs/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+
+# Environment / Local settings
+.env
+.env.local
+config.json
+
+# IDE / Editors
+.vscode/
+.idea/
+*.swp

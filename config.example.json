@@ -1,0 +1,47 @@
+{
+  "$schema": "https://raw.githubusercontent.com/mcontartesi/webpage-signage-runner/main/schema.json",
+  "version": "1.0.0",
+  "defaultUrl": "https://antigravity.google",
+  "hideCursorGlobal": true,
+  "defaultReloadIntervalMinutes": 60,
+  "defaultRetryIntervalSeconds": 10,
+  "autoStartOnBoot": true,
+  "emergencyShortcut": "CommandOrControl+Shift+C",
+  "api": {
+    "enabled": true,
+    "port": 9191,
+    "host": "0.0.0.0",
+    "authToken": "signage-secret-token-12345",
+    "cors": true
+  },
+  "watchdog": {
+    "maxRetries": 10,
+    "unresponsiveTimeoutSeconds": 15,
+    "clearCacheOnReload": true,
+    "autoRecoverCrashes": true
+  },
+  "displays": [
+    {
+      "id": 1,
+      "label": "Main Entrance Video Wall (4K)",
+      "url": "https://grafana.company.internal/d/entrance-metrics?kiosk",
+      "fallbackUrl": "",
+      "reloadIntervalMinutes": 60,
+      "retryIntervalSeconds": 10,
+      "hideCursor": true,
+      "zoomFactor": 1.0,
+      "enabled": true
+    },
+    {
+      "id": 2,
+      "label": "Reception Directory Display",
+      "url": "https://directory.company.internal/lobby",
+      "fallbackUrl": "",
+      "reloadIntervalMinutes": 120,
+      "retryIntervalSeconds": 15,
+      "hideCursor": true,
+      "zoomFactor": 1.25,
+      "enabled": true
+    }
+  ]
+}

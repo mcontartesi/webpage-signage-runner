@@ -1,0 +1,55 @@
+appId: com.maximilianocontartesi.webpage-signage-runner
+productName: Webpage Signage Runner
+copyright: "Copyright © 2026 Maximiliano Contartesi"
+
+directories:
+  output: release
+  buildResources: assets
+
+files:
+  - dist/**/*
+  - package.json
+  - "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}"
+  - "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+  icon: assets/icon.svg
+  artifactName: "${productName}-Setup-${version}-${arch}.${ext}"
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: "Webpage Signage Runner"
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+        - arm64
+    - target: deb
+      arch:
+        - x64
+        - arm64
+    - target: rpm
+      arch:
+        - x64
+    - target: tar.gz
+      arch:
+        - x64
+        - arm64
+  category: Utility
+  executableName: webpage-signage-runner
+  maintainer: "Maximiliano Contartesi"
+  synopsis: "Production-grade unattended Multi-Display Digital Signage Kiosk runner"
+  description: "Cross-platform multi-display kiosk runner for unattended digital signage on Windows and Linux."
+  icon: assets/icon.svg

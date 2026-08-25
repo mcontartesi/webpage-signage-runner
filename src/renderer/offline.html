@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Display Offline - Webpage Signage Runner</title>
+  <link rel="stylesheet" href="offline.css">
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-card">
+      <!-- Status Icon with Pulse Animation -->
+      <div class="status-icon-wrap">
+        <div class="pulse-ring"></div>
+        <div class="icon-center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+            <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+            <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+            <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+            <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <line x1="12" y1="20" x2="12.01" y2="20"></line>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Main Headline & Subhead -->
+      <h1 class="offline-title">Display Feed Offline</h1>
+      <p class="offline-subtitle">Unable to reach the signage target server. Automatic reconnection in progress.</p>
+
+      <!-- Target URL Box -->
+      <div class="target-box">
+        <span class="target-label">Target URL:</span>
+        <span id="target-url-text" class="target-url">https://example.com</span>
+      </div>
+
+      <!-- Circular / Countdown Timer -->
+      <div class="countdown-section">
+        <div class="countdown-circle">
+          <svg class="progress-ring" width="120" height="120">
+            <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.1)" stroke-width="6" fill="transparent" r="52" cx="60" cy="60"/>
+            <circle id="progress-bar" class="progress-ring-bar" stroke="#38bdf8" stroke-width="6" stroke-linecap="round" fill="transparent" r="52" cx="60" cy="60"/>
+          </svg>
+          <div class="countdown-number">
+            <span id="countdown-text">10</span>
+            <span class="countdown-unit">sec</span>
+          </div>
+        </div>
+        <p class="countdown-caption">Retrying connection in <strong id="countdown-sub">10</strong>s (Attempt #<span id="attempt-count">1</span>)</p>
+      </div>
+
+      <!-- Diagnostics Panel -->
+      <div class="diagnostics-panel">
+        <div class="diag-item">
+          <span class="diag-label">Screen ID:</span>
+          <span id="diag-display-id" class="diag-val">#1</span>
+        </div>
+        <div class="diag-item">
+          <span class="diag-label">Error Code:</span>
+          <span id="diag-error-code" class="diag-val badge-error">ERR_CONNECTION_REFUSED</span>
+        </div>
+        <div class="diag-item">
+          <span class="diag-label">Network Status:</span>
+          <span id="diag-network-status" class="diag-val badge-net">Checking...</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="offline-actions">
+        <button id="btn-retry-now" class="btn-retry">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          Retry Connection Now
+        </button>
+      </div>
+
+      <!-- Footer Info -->
+      <div class="offline-footer">
+        <span>Webpage Signage Runner • Press <code>Ctrl+Shift+C</code> for Admin Setup</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="offline.js"></script>
+</body>
+</html>
