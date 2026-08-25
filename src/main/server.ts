@@ -6,6 +6,7 @@ import { logger } from './logger';
 import { configManager } from './config';
 import { watchdogService } from './watchdog';
 import { windowManager } from './window-manager';
+import { OPENAPI_SPEC, getSwaggerHtml } from './swagger';
 
 export class HttpServer {
   private server: http.Server | null = null;
@@ -145,6 +146,21 @@ export class HttpServer {
       return;
     }
 
+    // Swagger UI Interactive Documentation Explorer
+    if ((pathname === '/' || pathname === '/docs' || pathname === '/swagger' || pathname === '/api-docs') && method === 'GET') {
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Access-Control-Allow-Origin': '*',
+      });
+      res.end(getSwaggerHtml());
+      return;
+    }
+
+    // OpenAPI Specification JSON
+    if ((pathname === '/openapi.json' || pathname === '/swagger.json') && method === 'GET') {
+      return this.sendJson(res, 200, OPENAPI_SPEC);
+    }
+
     // Health check endpoint (always unauthenticated)
     if (pathname === '/health' && method === 'GET') {
       return this.sendJson(res, 200, {
@@ -156,7 +172,7 @@ export class HttpServer {
       });
     }
 
-    // Authentication check for API endpoints
+    // Authentication check for protected API endpoints
     if (!this.authenticate(req)) {
       return this.sendError(res, 401, 'Unauthorized: Invalid or missing authentication token');
     }

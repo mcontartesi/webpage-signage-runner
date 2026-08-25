@@ -26,6 +26,18 @@ describe('HTTP Control API Logic & Endpoints', () => {
         return;
       }
 
+      if ((pathname === '/' || pathname === '/docs') && method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end('<!DOCTYPE html><html><head><title>Swagger UI</title></head><body><div id="swagger-ui"></div></body></html>');
+        return;
+      }
+
+      if (pathname === '/openapi.json' && method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ openapi: '3.0.3', info: { title: 'Test API' } }));
+        return;
+      }
+
       if (pathname === '/health' && method === 'GET') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ status: 'ok', uptime: 100 }));
@@ -97,6 +109,18 @@ describe('HTTP Control API Logic & Endpoints', () => {
       req.end();
     });
   };
+
+  it('should return Swagger UI HTML on root /', async () => {
+    const res = await request('/');
+    expect(res.status).toBe(200);
+    expect(res.body).toContain('Swagger UI');
+  });
+
+  it('should return OpenAPI JSON specification on /openapi.json', async () => {
+    const res = await request('/openapi.json');
+    expect(res.status).toBe(200);
+    expect(res.body.openapi).toBe('3.0.3');
+  });
 
   it('should return health status without authentication', async () => {
     const res = await request('/health');

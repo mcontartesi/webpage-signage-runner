@@ -179,12 +179,17 @@ Configurations are saved under `app.getPath('userData')/config.json`:
 
 ---
 
-## Remote HTTP REST API
+## Remote HTTP REST API & Swagger UI
 
-Webpage Signage Runner features an embedded HTTP server (port `9191` by default) for remote monitoring and central management.
+Webpage Signage Runner features an embedded HTTP server (port `9191` by default) for remote monitoring, central management, and interactive API exploration.
+
+- **Interactive Swagger UI:** Navigate to `http://<kiosk-ip>:9191/` (or `http://<kiosk-ip>:9191/docs`) in any browser to access the complete Swagger UI documentation with live request testing and schemas.
+- **OpenAPI 3.0 JSON:** `http://<kiosk-ip>:9191/openapi.json`
 
 | Method | Endpoint | Description |
 |---|---|---|
+| `GET` | `/` or `/docs` | Interactive Swagger UI Documentation Explorer |
+| `GET` | `/openapi.json` | OpenAPI 3.0 JSON Specification |
 | `GET` | `/health` | Fast liveness probe (`200 OK`) |
 | `GET` | `/api/status` | Complete node telemetry, uptime, memory, and display states |
 | `POST` | `/api/reload` | Triggers immediate cache clear & reload on all screens |
@@ -227,7 +232,7 @@ For step-by-step instructions on setting up Windows AutoLogon, Windows Shell Lau
    - Detecta fallos de red y muestra una pantalla offline con temporizador de reintento automático.
    - Recupera procesos colgados o caídos por falta de memoria (OOM).
    - Limpia periódicamente la caché de Chromium para evitar fugas de memoria en funcionamiento 24/7.
-6. **API HTTP REST Embebida (Puerto 9191)**: Permite monitoreo de estado, cambios remotos de URL, capturas de pantalla remotas y reinicio sin teclado.
+6. **API HTTP REST Embebida con Swagger UI (Puerto 9191)**: Permite monitoreo de estado, cambios remotos de URL, capturas de pantalla y reinicio. Incluye interfaz interactiva Swagger UI en `http://<ip>:9191/` (o `/docs`) para explorar y probar endpoints en vivo.
 7. **Arranque Automático con el Sistema**: Configuración integrada para iniciar junto con Windows o Linux.
 8. **Atajo de Emergencia**: Presiona **`Ctrl + Shift + C`** o **`CmdOrCtrl + Alt + S`** para salir del modo kiosk y abrir la configuración.
 

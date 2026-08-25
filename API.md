@@ -6,6 +6,17 @@ This API enables system administrators, monitoring dashboards (such as Prometheu
 
 ---
 
+## Interactive Swagger UI Explorer
+
+You can access the built-in interactive Swagger UI documentation simply by opening the API port in any web browser:
+
+- **Swagger UI URL:** `http://<kiosk-ip>:9191/` (or `http://<kiosk-ip>:9191/docs`)
+- **OpenAPI 3.0 JSON:** `http://<kiosk-ip>:9191/openapi.json`
+
+The Swagger UI explorer allows you to authenticate, inspect schemas, and execute live API requests directly from the browser using the **Try it out** button.
+
+---
+
 ## Authentication & Headers
 
 If configured in `config.json` (or via Setup Wizard), all endpoints except `/health` require authentication.
