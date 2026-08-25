@@ -11,24 +11,28 @@
     <!-- Header -->
     <header class="header">
       <div class="header-brand">
-        <div class="logo-icon">
+        <div class="logo-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
             <line x1="8" y1="21" x2="16" y2="21"></line>
             <line x1="12" y1="17" x2="12" y2="21"></line>
           </svg>
         </div>
-        <div>
-          <h1 class="title">Webpage Signage Runner</h1>
+        <div class="header-title-group">
+          <div class="title-row">
+            <h1 class="title">Webpage Signage Runner</h1>
+            <span class="version-badge">v1.0.0</span>
+          </div>
           <p class="subtitle">Multi-Display Digital Signage Kiosk Orchestrator • By Maximiliano Contartesi</p>
         </div>
       </div>
+
       <div class="header-actions">
-        <button id="btn-identify" class="btn btn-secondary" title="Flash identification numbers on all physical screens">
+        <button id="btn-identify" class="btn btn-identify" title="Flash identification numbers on all physical screens">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
           </svg>
-          Identify Screens
+          <span>Identify Screens</span>
         </button>
         <button id="btn-refresh" class="btn btn-secondary" title="Re-scan connected monitors">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -36,15 +40,7 @@
             <polyline points="1 20 1 14 7 14"></polyline>
             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
           </svg>
-          Refresh
-        </button>
-        <button id="btn-about" class="btn btn-secondary" title="View credits and author information">
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
-          About
+          <span>Refresh</span>
         </button>
         <button id="btn-logs" class="btn btn-secondary" title="Open diagnostic logs directory">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -54,7 +50,15 @@
             <line x1="16" y1="17" x2="8" y2="17"></line>
             <polyline points="10 9 9 9 8 9"></polyline>
           </svg>
-          Logs
+          <span>Logs</span>
+        </button>
+        <button id="btn-about" class="btn btn-secondary" title="View credits and author information">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>About</span>
         </button>
       </div>
     </header>
@@ -62,10 +66,10 @@
     <!-- Main Content Area -->
     <main class="content-scroll">
       <!-- Displays Section -->
-      <section class="section">
+      <section class="section" aria-labelledby="section-displays-heading">
         <div class="section-header">
           <div class="section-title-wrap">
-            <h2 class="section-title">Connected Displays</h2>
+            <h2 id="section-displays-heading" class="section-title">Connected Displays</h2>
             <span id="display-count-badge" class="badge badge-primary">0 detected</span>
           </div>
           <p class="section-desc">Assign specific target URLs, cache reload frequencies, and display scaling per screen.</p>
@@ -81,110 +85,189 @@
       </section>
 
       <!-- Global Settings Section -->
-      <section class="section">
+      <section class="section" aria-labelledby="section-global-heading">
         <div class="section-header">
-          <h2 class="section-title">System & Global Preferences</h2>
+          <h2 id="section-global-heading" class="section-title">System & Global Preferences</h2>
           <p class="section-desc">Tune resilience watchdog, remote HTTP control API, and operating system startup integration.</p>
         </div>
 
         <div class="settings-grid">
           <!-- General Settings Card -->
           <div class="card">
-            <h3 class="card-title">General & Recovery</h3>
-            <div class="form-group">
-              <label for="global-default-url">Global Default URL</label>
-              <input type="url" id="global-default-url" class="form-input" placeholder="https://www.youtube.com" value="https://www.youtube.com" required>
-              <span class="form-hint">Used when new unconfigured monitors are hotplugged.</span>
+            <div class="card-header">
+              <div class="card-icon-title">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                <h3 class="card-title">General & System</h3>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label for="global-shortcut">Emergency Setup Hotkey</label>
-              <input type="text" id="global-shortcut" class="form-input" value="CommandOrControl+Shift+C">
-              <span class="form-hint">Press this combination anytime to exit kiosk or reopen this wizard.</span>
-            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label for="global-default-url">Global Default URL</label>
+                <input type="url" id="global-default-url" class="form-input" placeholder="https://www.youtube.com" value="https://www.youtube.com" required>
+                <span class="form-hint">Applied as default target when unconfigured monitors are hotplugged.</span>
+              </div>
 
-            <div class="form-checkbox-group">
-              <label class="checkbox-container">
-                <input type="checkbox" id="global-autostart" checked>
-                <span class="checkmark"></span>
-                <span class="checkbox-label">Launch automatically on OS boot (Autostart)</span>
-              </label>
-            </div>
+              <div class="form-group">
+                <label for="global-shortcut">Emergency Setup Hotkey</label>
+                <div class="hotkey-input-wrap">
+                  <input type="text" id="global-shortcut" class="form-input font-mono" value="CommandOrControl+Shift+C">
+                  <div class="hotkey-badge-preview">
+                    <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd>
+                  </div>
+                </div>
+                <span class="form-hint">Press anytime in kiosk mode to exit or reopen configuration.</span>
+              </div>
 
-            <div class="form-checkbox-group">
-              <label class="checkbox-container">
-                <input type="checkbox" id="global-hide-cursor" checked>
-                <span class="checkmark"></span>
-                <span class="checkbox-label">Hide mouse pointer on all screens by default</span>
-              </label>
+              <div class="control-group">
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <span class="toggle-title">Autostart on Boot</span>
+                    <span class="toggle-desc">Automatically launch kiosk on operating system startup</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="global-autostart" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <span class="toggle-title">Hide Mouse Cursor</span>
+                    <span class="toggle-desc">Hide pointer globally across all connected screens</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="global-hide-cursor" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- HTTP Control API Card -->
           <div class="card">
-            <h3 class="card-title">Remote Control & Health API</h3>
-            <div class="form-checkbox-group">
-              <label class="checkbox-container">
-                <input type="checkbox" id="api-enabled" checked>
-                <span class="checkmark"></span>
-                <span class="checkbox-label">Enable Embedded REST API</span>
-              </label>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group flex-1">
-                <label for="api-port">Port</label>
-                <input type="number" id="api-port" class="form-input" value="9191" min="1024" max="65535">
-              </div>
-              <div class="form-group flex-2">
-                <label for="api-host">Bind Host</label>
-                <input type="text" id="api-host" class="form-input" value="0.0.0.0">
+            <div class="card-header">
+              <div class="card-icon-title">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                <h3 class="card-title">Remote Control & Health API</h3>
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="api-token">API Auth Token (Optional)</label>
-              <input type="password" id="api-token" class="form-input" placeholder="Leave empty for unauthenticated LAN access">
-              <span class="form-hint">Header: <code>Authorization: Bearer &lt;token&gt;</code></span>
-            </div>
+            <div class="card-body">
+              <div class="toggle-row highlight-toggle">
+                <div class="toggle-info">
+                  <span class="toggle-title">Enable Embedded REST API</span>
+                  <span class="toggle-desc">Expose HTTP endpoints for remote orchestration & health checks</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="api-enabled" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
 
-            <div class="api-endpoints-preview">
-              <span class="endpoint-tag">GET /health</span>
-              <span class="endpoint-tag">GET /api/status</span>
-              <span class="endpoint-tag">POST /api/reload</span>
+              <div id="api-dependent-fields" class="api-fields-wrap">
+                <div class="form-row">
+                  <div class="form-group flex-1">
+                    <label for="api-port">Port</label>
+                    <input type="number" id="api-port" class="form-input font-mono" value="9191" min="1024" max="65535">
+                  </div>
+                  <div class="form-group flex-2">
+                    <label for="api-host">Bind Host</label>
+                    <input type="text" id="api-host" class="form-input font-mono" value="0.0.0.0">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="api-token">API Auth Token (Optional)</label>
+                  <div class="input-action-group">
+                    <input type="password" id="api-token" class="form-input font-mono" placeholder="Leave empty for unauthenticated LAN access">
+                    <button type="button" id="btn-toggle-token" class="btn btn-secondary btn-icon-only" title="Show/Hide Token" aria-label="Toggle token visibility">
+                      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                    </button>
+                  </div>
+                  <span class="form-hint">Passed as header: <code>Authorization: Bearer &lt;token&gt;</code></span>
+                </div>
+
+                <div class="api-endpoints-box">
+                  <span class="endpoints-label">Available API Endpoints (Click to copy):</span>
+                  <div class="api-endpoints-preview">
+                    <button type="button" class="endpoint-tag" data-endpoint="/health" title="Click to copy endpoint">
+                      <span class="method-tag get">GET</span> /health
+                    </button>
+                    <button type="button" class="endpoint-tag" data-endpoint="/api/status" title="Click to copy endpoint">
+                      <span class="method-tag get">GET</span> /api/status
+                    </button>
+                    <button type="button" class="endpoint-tag" data-endpoint="/api/reload" title="Click to copy endpoint">
+                      <span class="method-tag post">POST</span> /api/reload
+                    </button>
+                    <button type="button" class="endpoint-tag" data-endpoint="/api/docs" title="Click to copy endpoint">
+                      <span class="method-tag get">GET</span> /api/docs
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Watchdog Card -->
           <div class="card">
-            <h3 class="card-title">Watchdog & Resilience</h3>
-            <div class="form-row">
-              <div class="form-group flex-1">
-                <label for="watchdog-reload-mins">Cache Reload (Mins)</label>
-                <input type="number" id="watchdog-reload-mins" class="form-input" value="60" min="0">
-                <span class="form-hint">0 disables auto-reload.</span>
-              </div>
-              <div class="form-group flex-1">
-                <label for="watchdog-retry-secs">Offline Retry (Secs)</label>
-                <input type="number" id="watchdog-retry-secs" class="form-input" value="10" min="3" max="300">
-                <span class="form-hint">Reconnection interval.</span>
+            <div class="card-header">
+              <div class="card-icon-title">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <h3 class="card-title">Watchdog & Resilience</h3>
               </div>
             </div>
 
-            <div class="form-checkbox-group">
-              <label class="checkbox-container">
-                <input type="checkbox" id="watchdog-clear-cache" checked>
-                <span class="checkmark"></span>
-                <span class="checkbox-label">Purge Chromium cache during scheduled reload</span>
-              </label>
-            </div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="watchdog-reload-mins">Cache Reload (Mins)</label>
+                  <input type="number" id="watchdog-reload-mins" class="form-input" value="60" min="0">
+                  <span class="form-hint">0 disables timer.</span>
+                </div>
+                <div class="form-group flex-1">
+                  <label for="watchdog-retry-secs">Offline Retry (Secs)</label>
+                  <input type="number" id="watchdog-retry-secs" class="form-input" value="10" min="3" max="300">
+                  <span class="form-hint">Reconnect wait.</span>
+                </div>
+              </div>
 
-            <div class="form-checkbox-group">
-              <label class="checkbox-container">
-                <input type="checkbox" id="watchdog-auto-recover" checked>
-                <span class="checkmark"></span>
-                <span class="checkbox-label">Auto-recreate windows on process crash or OOM</span>
-              </label>
+              <div class="control-group">
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <span class="toggle-title">Purge Chromium Cache</span>
+                    <span class="toggle-desc">Clear web cache during scheduled reloads to prevent memory bloat</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="watchdog-clear-cache" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <span class="toggle-title">Auto-Recover Window Crashes</span>
+                    <span class="toggle-desc">Rebuild render processes instantly upon GPU or renderer crash</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="watchdog-auto-recover" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -193,24 +276,29 @@
 
     <!-- Footer Action Bar -->
     <footer class="footer">
-      <div id="status-toast" class="status-toast hidden"></div>
+      <div class="footer-left">
+        <div id="status-toast" class="status-toast hidden" role="status" aria-live="polite"></div>
+        <div class="footer-shortcut-hint">
+          <span>Quick save: <kbd>Ctrl</kbd> + <kbd>S</kbd></span>
+        </div>
+      </div>
       <div class="footer-actions">
         <button id="btn-save" class="btn btn-primary btn-large">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
-          Save & Launch Kiosk Mode
+          <span>Save & Launch Kiosk Mode</span>
         </button>
       </div>
     </footer>
   </div>
 
   <!-- About & Credits Modal -->
-  <div id="about-modal" class="modal-backdrop hidden">
+  <div id="about-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-card">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <div class="logo-icon modal-logo">
+          <div class="logo-icon modal-logo" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
               <line x1="8" y1="21" x2="16" y2="21"></line>
@@ -218,38 +306,51 @@
             </svg>
           </div>
           <div>
-            <h2 class="modal-title">Webpage Signage Runner</h2>
-            <p class="modal-version">Version 1.0.0 • Open Source MIT</p>
+            <h2 id="modal-title" class="modal-title">Webpage Signage Runner</h2>
+            <p class="modal-version">Version 1.0.0 • Open Source MIT License</p>
           </div>
         </div>
-        <button id="btn-close-about" class="btn-close" title="Close modal">&times;</button>
+        <button id="btn-close-about" class="btn-close" title="Close modal" aria-label="Close dialog">&times;</button>
       </div>
 
       <div class="modal-body">
         <p class="modal-desc">
-          High-performance, unattended Multi-Display Digital Signage Kiosk system running on Windows and Linux using Electron and TypeScript.
+          High-performance, production-ready Multi-Display Digital Signage Kiosk orchestrator running on Windows and Linux with Electron, TypeScript and Chromium.
         </p>
 
         <div class="credits-card">
-          <div class="credits-title">Created and maintained with ❤️ by <strong>Maximiliano Contartesi</strong></div>
+          <div class="credits-title">Created & maintained with ❤️ by <strong>Maximiliano Contartesi</strong></div>
           <ul class="credits-list">
             <li>
-              <span class="credit-icon">💼</span>
-              <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/maxiconta/" target="_blank">maxiconta</a>
+              <span class="credit-icon" aria-hidden="true">💼</span>
+              <span class="credit-label">LinkedIn:</span>
+              <a href="https://www.linkedin.com/in/maxiconta/" target="_blank" rel="noopener noreferrer">maxiconta</a>
             </li>
             <li>
-              <span class="credit-icon">🐙</span>
-              <strong>GitHub:</strong> <a href="https://github.com/mcontartesi" target="_blank">@mcontartesi</a>
+              <span class="credit-icon" aria-hidden="true">🐙</span>
+              <span class="credit-label">GitHub:</span>
+              <a href="https://github.com/mcontartesi" target="_blank" rel="noopener noreferrer">@mcontartesi</a>
             </li>
             <li>
-              <span class="credit-icon">✉️</span>
-              <strong>Email / Contact:</strong> <a href="mailto:maxiconta@gmail.com">maxiconta [at] gmail [dot] com</a>
+              <span class="credit-icon" aria-hidden="true">✉️</span>
+              <span class="credit-label">Email:</span>
+              <a href="mailto:maxiconta@gmail.com">maxiconta@gmail.com</a>
             </li>
             <li>
-              <span class="credit-icon">📝</span>
-              <strong>Medium:</strong> <a href="https://medium.com/@maxiconta" target="_blank">@maxiconta</a>
+              <span class="credit-icon" aria-hidden="true">📝</span>
+              <span class="credit-label">Medium:</span>
+              <a href="https://medium.com/@maxiconta" target="_blank" rel="noopener noreferrer">@maxiconta</a>
             </li>
           </ul>
+        </div>
+
+        <div class="tech-stack-pills">
+          <span class="tech-pill">Electron</span>
+          <span class="tech-pill">TypeScript</span>
+          <span class="tech-pill">Chromium 120+</span>
+          <span class="tech-pill">Zod Schema</span>
+          <span class="tech-pill">REST API</span>
+          <span class="tech-pill">Screensaver Inhibitor</span>
         </div>
       </div>
 

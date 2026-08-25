@@ -5,6 +5,7 @@
 **Production-grade, unattended Multi-Display Digital Signage Kiosk orchestrator for Windows and Linux.**
 
 [![Release: v1.0.0](https://img.shields.io/badge/Release-v1.0.0-0ea5e9?logo=github&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/releases)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-38bdf8?logo=googlechrome&logoColor=white)](https://mcontartesi.github.io/webpage-signage-runner/)
 [![Wiki Documentation](https://img.shields.io/badge/Documentation-GitHub%20Wiki-blueviolet?logo=gitbook&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/wiki)
 [![Downloads](https://img.shields.io/badge/Downloads-Windows%20%7C%20Linux-10b981?logo=windows&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -14,6 +15,7 @@
 [![Created By Maximiliano Contartesi](https://img.shields.io/badge/Author-Maximiliano%20Contartesi-0ea5e9?logo=github&logoColor=white)](https://github.com/mcontartesi)
 
 <p align="center">
+  <a href="https://mcontartesi.github.io/webpage-signage-runner/"><b>🌐 Interactive Live Demo</b></a> •
   <a href="https://github.com/mcontartesi/webpage-signage-runner/wiki"><b>📚 Official GitHub Wiki</b></a> •
   <a href="#-quick-download--descargas-directas"><b>📥 Quick Download</b></a> •
   <a href="#key-features">Key Features</a> •
@@ -322,6 +324,10 @@ Created and maintained with ❤️ by [**Maximiliano Contartesi**](https://githu
 ---
 
 ## Guía en Español
+
+### 🌐 Demo Interactiva en Vivo (GitHub Pages)
+Puedes probar el simulador web y asistente interactivo directamente desde tu navegador:
+👉 **[Acceder a la Demo Interactiva en GitHub Pages](https://mcontartesi.github.io/webpage-signage-runner/)** *(Nota: la demo web incluye un cartel indicativo de simulación y no controla hardware físico de video).*
 
 ### 📥 Descargas Rápidas (Para Usuarios Finales)
 No se requieren conocimientos técnicos de programación ni Node.js. Descarga el ejecutable para tu sistema operativo:
