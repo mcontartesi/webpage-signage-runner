@@ -47,44 +47,44 @@
 
 ```mermaid
 flowchart TD
-    subgraph Host OS [Windows / Linux Kiosk Device]
-        Power[Power Save Blocker]
-        AutoStart[OS Autostart Integration]
-        Hotkeys[Global Emergency Shortcuts]
+    subgraph HostOS["Host OS (Windows / Linux)"]
+        Power["Power Save Blocker"]
+        AutoStart["OS Autostart Integration"]
+        Hotkeys["Global Emergency Shortcuts"]
     end
 
-    subgraph Electron Main Process
-        WM[Window Manager]
-        CM[Config Manager - Zod]
-        WD[Watchdog & Cache Purger]
-        API[Embedded HTTP API :9191]
-        Log[Structured Logger]
+    subgraph MainProcess["Electron Main Process"]
+        WM["Window Manager"]
+        CM["Config Manager (Zod)"]
+        WD["Watchdog & Cache Purger"]
+        API["Embedded HTTP API (:9191)"]
+        Log["Structured Logger"]
     end
 
-    subgraph Hardware Displays
-        D1[Physical Screen 1]
-        D2[Physical Screen 2]
-        DN[Physical Screen N]
+    subgraph Displays["Hardware Displays"]
+        D1["Physical Screen 1"]
+        D2["Physical Screen 2"]
+        DN["Physical Screen N"]
     end
 
-    subgraph Renderers
-        UI1[Kiosk BrowserWindow 1]
-        UI2[Kiosk BrowserWindow 2]
-        UIN[Kiosk BrowserWindow N]
-        Offline[Offline Fallback UI]
-        Setup[Setup Wizard UI]
+    subgraph Renderers["Renderers & Views"]
+        UI1["Kiosk BrowserWindow 1"]
+        UI2["Kiosk BrowserWindow 2"]
+        UIN["Kiosk BrowserWindow N"]
+        Offline["Offline Fallback UI"]
+        Setup["Setup Wizard UI"]
     end
 
-    Host OS --> Electron Main Process
-    WM -->|Pin exact bounds| D1
-    WM -->|Pin exact bounds| D2
-    WM -->|Pin exact bounds| DN
+    HostOS --> MainProcess
+    WM -->|"Pin bounds"| D1
+    WM -->|"Pin bounds"| D2
+    WM -->|"Pin bounds"| DN
     WM --> UI1
     WM --> UI2
     WM --> UIN
-    WD -->|On Fail / Timeout| Offline
-    CM -->|First Run| Setup
-    API -->|Remote Control| WM
+    WD -->|"On Failure"| Offline
+    CM -->|"First Run"| Setup
+    API -->|"Remote Control"| WM
 ```
 
 ---
