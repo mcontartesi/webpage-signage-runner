@@ -4,7 +4,7 @@
 
 **Production-grade, unattended Multi-Display Digital Signage Kiosk orchestrator for Windows and Linux.**
 
-[![Release: v1.0.0](https://img.shields.io/badge/Release-v1.0.0-0ea5e9?logo=github&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/releases)
+[![Release: v1.1.0](https://img.shields.io/badge/Release-v1.1.0-0ea5e9?logo=github&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/releases)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-38bdf8?logo=googlechrome&logoColor=white)](https://mcontartesi.github.io/webpage-signage-runner/)
 [![Wiki Documentation](https://img.shields.io/badge/Documentation-GitHub%20Wiki-blueviolet?logo=gitbook&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/wiki)
 [![Downloads](https://img.shields.io/badge/Downloads-Windows%20%7C%20Linux-10b981?logo=windows&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/releases)
@@ -40,17 +40,17 @@
 
 | Type | File | Description | Download |
 |---|---|---|---|
-| **Installer** | `Webpage-Signage-Runner-Setup-1.0.0-x64.exe` | Standard Windows Setup Wizard (with Desktop & Start Menu shortcuts, Autostart) | [⬇️ Download Installer](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Setup-1.0.0-x64.exe) |
-| **Portable** | `Webpage-Signage-Runner-Portable-1.0.0-x64.exe` | Standalone executable (runs directly from USB or folder, no installation required) | [⬇️ Download Portable](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Portable-1.0.0-x64.exe) |
+| **Installer** | `Webpage-Signage-Runner-Setup-1.1.0-x64.exe` | Standard Windows Setup Wizard (with Desktop & Start Menu shortcuts, Autostart) | [⬇️ Download Installer](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Setup-1.1.0-x64.exe) |
+| **Portable** | `Webpage-Signage-Runner-Portable-1.1.0-x64.exe` | Standalone executable (runs directly from USB or folder, no installation required) | [⬇️ Download Portable](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Portable-1.1.0-x64.exe) |
 
 ### 🐧 Linux (Ubuntu, Debian, Fedora, Arch, Raspberry Pi OS)
 
 | Package | File | Description | Download |
 |---|---|---|---|
-| **AppImage** | `webpage-signage-runner-1.0.0-x64.AppImage` | Universal Linux standalone binary (runs on all distributions) | [⬇️ Download AppImage](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.AppImage) |
-| **Debian / Ubuntu** | `webpage-signage-runner-1.0.0-x64.deb` | Native `.deb` package for Ubuntu, Debian, Linux Mint | [⬇️ Download .deb](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.deb) |
-| **Fedora / RHEL** | `webpage-signage-runner-1.0.0-x64.rpm` | Native `.rpm` package for Fedora, CentOS, Rocky Linux | [⬇️ Download .rpm](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.rpm) |
-| **Tarball** | `webpage-signage-runner-1.0.0-x64.tar.gz` | Portable tarball archive | [⬇️ Download .tar.gz](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.tar.gz) |
+| **AppImage** | `webpage-signage-runner-1.1.0-x64.AppImage` | Universal Linux standalone binary (runs on all distributions) | [⬇️ Download AppImage](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.0-x64.AppImage) |
+| **Debian / Ubuntu** | `webpage-signage-runner-1.1.0-x64.deb` | Native `.deb` package for Ubuntu, Debian, Linux Mint | [⬇️ Download .deb](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.0-x64.deb) |
+| **Fedora / RHEL** | `webpage-signage-runner-1.1.0-x64.rpm` | Native `.rpm` package for Fedora, CentOS, Rocky Linux | [⬇️ Download .rpm](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.0-x64.rpm) |
+| **Tarball** | `webpage-signage-runner-1.1.0-x64.tar.gz` | Portable tarball archive | [⬇️ Download .tar.gz](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.0-x64.tar.gz) |
 
 👉 **[View all Releases and Version Changelog on GitHub Releases](https://github.com/mcontartesi/webpage-signage-runner/releases)**
 
@@ -331,10 +331,10 @@ Puedes probar el simulador web y asistente interactivo directamente desde tu nav
 
 ### 📥 Descargas Rápidas (Para Usuarios Finales)
 No se requieren conocimientos técnicos de programación ni Node.js. Descarga el ejecutable para tu sistema operativo:
-- **Windows Instalador (`.exe`):** [Descargar Instalador](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Setup-1.0.0-x64.exe)
-- **Windows Portable (`.exe`):** [Descargar Portable](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Portable-1.0.0-x64.exe)
-- **Linux AppImage:** [Descargar AppImage](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.AppImage)
-- **Linux Debian / Ubuntu (`.deb`):** [Descargar .deb](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.0.0-x64.deb)
+- **Windows Instalador (`.exe`):** [Descargar Instalador](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Setup-1.1.0-x64.exe)
+- **Windows Portable (`.exe`):** [Descargar Portable](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Portable-1.1.0-x64.exe)
+- **Linux AppImage:** [Descargar AppImage](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.0-x64.AppImage)
+- **Linux Debian / Ubuntu (`.deb`):** [Descargar .deb](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.0-x64.deb)
 
 ### Características Principales
 1. **Gestión Dinámica Multi-Monitor**: Detecta automáticamente todas las pantallas físicas conectadas y proyecta ventanas independientes sin bordes en modo Kiosk fijadas a las coordenadas exactas de cada pantalla.

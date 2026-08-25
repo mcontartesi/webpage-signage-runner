@@ -75,7 +75,7 @@ export type WatchdogConfig = z.infer<typeof WatchdogConfigSchema>;
  */
 export const SignageConfigSchema = z.object({
   $schema: z.string().optional(),
-  version: z.string().default('1.0.0'),
+  version: z.string().default('1.1.0'),
   /** Default URL to assign when new displays are hotplugged or not configured */
   defaultUrl: z.string().url().default('https://www.youtube.com'),
   /** Global cursor hiding toggle */

@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/mcontartesi/webpage-signage-runner/main/schema.json",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "defaultUrl": "https://www.youtube.com",
   "hideCursorGlobal": true,
   "defaultReloadIntervalMinutes": 60,

@@ -57,7 +57,7 @@ describe('ConfigManager & Zod Schema', () => {
 
   it('should validate complete SignageConfigSchema', () => {
     const rawConfig = {
-      version: '1.0.0',
+      version: '1.1.0',
       defaultUrl: 'https://www.youtube.com',
       autoStartOnBoot: true,
       api: {
@@ -73,7 +73,7 @@ describe('ConfigManager & Zod Schema', () => {
     };
 
     const parsed = SignageConfigSchema.parse(rawConfig);
-    expect(parsed.version).toBe('1.0.0');
+    expect(parsed.version).toBe('1.1.0');
     expect(parsed.api.port).toBe(9191);
     expect(parsed.api.host).toBe('0.0.0.0');
     expect(parsed.displays.length).toBe(1);
