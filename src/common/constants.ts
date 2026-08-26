@@ -3,7 +3,7 @@ import { SignageConfig } from './types';
 export const APP_NAME = 'webpage-signage-runner';
 export const APP_TITLE = 'Webpage Signage Runner';
 export const APP_AUTHOR = 'Maximiliano Contartesi';
-export const APP_VERSION = '1.1.1';
+export const APP_VERSION = '1.1.2';
 
 export const AUTHOR_CREDITS = {
   name: 'Maximiliano Contartesi',

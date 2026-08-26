@@ -263,14 +263,16 @@ export class WindowManager {
         this.createKioskWindowForDisplay(display, i);
       } else {
         const targetUrl = displayConf.url || newConfig.defaultUrl;
-        watchdogService.updateTargetUrl(
-          display.id,
+        watchdogService.updateDisplayConfig(display.id, {
           targetUrl,
-          true,
-          displayConf.httpMethod || 'GET',
-          displayConf.headers,
-          displayConf.requestBody
-        );
+          fallbackUrl: displayConf.fallbackUrl,
+          reloadIntervalMinutes: displayConf.reloadIntervalMinutes ?? newConfig.defaultReloadIntervalMinutes ?? 60,
+          retryIntervalSeconds: displayConf.retryIntervalSeconds ?? newConfig.defaultRetryIntervalSeconds ?? 10,
+          httpMethod: displayConf.httpMethod || 'GET',
+          headers: displayConf.headers,
+          requestBody: displayConf.requestBody,
+          reloadNow: true,
+        });
 
         if (displayConf.hideCursor) {
           win.webContents.insertCSS('* { cursor: none !important; }').catch(() => {});

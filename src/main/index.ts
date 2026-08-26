@@ -208,7 +208,22 @@ function registerIpcHandlers(): void {
     return { success: true };
   });
 
-  // 10. Quit application cleanly
+  // 10. Force reload specific display (with cache clearing)
+  ipcMain.handle(IPC_CHANNELS.RELOAD_DISPLAY, async (_event, displayId: number, clearCache: boolean = true) => {
+    const success = await watchdogService.reloadDisplay(displayId, clearCache);
+    return {
+      success,
+      message: success ? `Display #${displayId} reloaded successfully` : `Display #${displayId} not found`,
+    };
+  });
+
+  // 11. Force reload all active displays (with cache clearing)
+  ipcMain.handle(IPC_CHANNELS.RELOAD_ALL, async (_event, clearCache: boolean = true) => {
+    await watchdogService.reloadAll(clearCache);
+    return { success: true, message: 'All displays reloaded successfully' };
+  });
+
+  // 12. Quit application cleanly
   ipcMain.handle(IPC_CHANNELS.QUIT_APP, () => {
     logger.info('Main', 'Quit application requested via IPC');
     app.quit();

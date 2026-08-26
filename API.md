@@ -127,10 +127,11 @@ curl -H "Authorization: Bearer my-secret-token" \
 
 ---
 
-### 4. Reload All Displays
+### 4. Force Reload All Displays
 - **Method:** `POST`
 - **Path:** `/api/reload`
 - **Auth Required:** Yes (if token configured)
+- **Description:** Triggers a forced full hard reload and comprehensive cache purge (Chromium HTTP cache, Service Workers, CacheStorage, DNS resolver) across all active screens.
 - **Body (optional):**
   ```json
   {
@@ -148,10 +149,11 @@ curl -H "Authorization: Bearer my-secret-token" \
 
 ---
 
-### 5. Reload Specific Display
+### 5. Force Reload Specific Display
 - **Method:** `POST`
 - **Path:** `/api/displays/:id/reload`
 - **Auth Required:** Yes (if token configured)
+- **Description:** Triggers a forced hard reload (`reloadIgnoringCache` and cache-busting headers) with cache purge for a specific physical screen.
 - **Body (optional):**
   ```json
   {

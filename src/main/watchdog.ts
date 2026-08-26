@@ -32,15 +32,26 @@ export class WatchdogService {
   /**
    * Builds Electron loadURL options from method, headers, and requestBody.
    */
+  /**
+   * Builds Electron loadURL options from method, headers, and requestBody.
+   * Optionally appends cache-busting headers for forced hard reload.
+   */
   public static buildLoadOptions(
     httpMethod?: 'GET' | 'POST' | 'PUT',
     headers?: Record<string, string>,
-    requestBody?: string
+    requestBody?: string,
+    forceCacheBusting: boolean = false
   ): { extraHeaders?: string; postData?: Array<{ type: 'rawData'; bytes: Buffer }> } {
     const options: { extraHeaders?: string; postData?: Array<{ type: 'rawData'; bytes: Buffer }> } = {};
 
-    if (headers && Object.keys(headers).length > 0) {
-      options.extraHeaders = Object.entries(headers)
+    const headerMap: Record<string, string> = { ...(headers || {}) };
+    if (forceCacheBusting) {
+      headerMap['Pragma'] = 'no-cache';
+      headerMap['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+    }
+
+    if (Object.keys(headerMap).length > 0) {
+      options.extraHeaders = Object.entries(headerMap)
         .filter(([k, v]) => k.trim() !== '' && v !== undefined)
         .map(([k, v]) => `${k.trim()}: ${v}`)
         .join('\n');
@@ -56,6 +67,25 @@ export class WatchdogService {
     }
 
     return options;
+  }
+
+  /**
+   * Purges Chromium disk & memory cache, Service Workers, CacheStorage, and host DNS resolver cache.
+   */
+  public static async purgeSessionCache(win: BrowserWindow): Promise<void> {
+    if (win.isDestroyed()) return;
+    try {
+      const ses = win.webContents.session || session.defaultSession;
+      await ses.clearCache();
+      await ses.clearStorageData({
+        storages: ['cachestorage', 'serviceworkers', 'shadercache'],
+      });
+      if (typeof ses.clearHostResolverCache === 'function') {
+        await ses.clearHostResolverCache();
+      }
+    } catch (err) {
+      logger.warn('Watchdog', 'Error purging session cache:', err);
+    }
   }
 
   /**
@@ -94,7 +124,7 @@ export class WatchdogService {
     this.attachEventListeners(state);
     this.scheduleCacheReload(state);
 
-    logger.info('Watchdog', `Registered display #${displayId} [Target: ${httpMethod} ${targetUrl}]`);
+    logger.info('Watchdog', `Registered display #${displayId} [Target: ${httpMethod} ${targetUrl}, ReloadInterval: ${reloadIntervalMinutes}m]`);
   }
 
   /**
@@ -163,7 +193,7 @@ export class WatchdogService {
           try {
             win.webContents.forcefullyCrashRenderer();
           } catch {
-            win.reload();
+            this.reloadDisplay(displayId, true);
           }
         }, 15000);
       }
@@ -194,7 +224,7 @@ export class WatchdogService {
       } else {
         setTimeout(() => {
           if (!win.isDestroyed()) {
-            win.reload();
+            this.reloadDisplay(displayId, true);
           }
         }, 2000);
       }
@@ -248,71 +278,138 @@ export class WatchdogService {
 
     logger.info('Watchdog', `Retrying load for display #${displayId}: [${state.httpMethod || 'GET'}] ${state.targetUrl}`);
     state.status = 'loading';
-    const loadOptions = WatchdogService.buildLoadOptions(state.httpMethod, state.headers, state.requestBody);
+    const loadOptions = WatchdogService.buildLoadOptions(state.httpMethod, state.headers, state.requestBody, true);
     state.window.loadURL(state.targetUrl, loadOptions).catch((err) => {
       logger.warn('Watchdog', `Retry load failed for display #${displayId}:`, err);
     });
   }
 
   /**
-   * Sets up periodic memory cache purge & reload to prevent Chromium memory leaks.
+   * Sets up periodic forced memory/disk cache purge & hard reload to prevent Chromium memory leaks
+   * and ensure the display always runs the latest version of the target web application.
    */
   private scheduleCacheReload(state: DisplayState): void {
-    if (state.reloadIntervalMinutes <= 0) return;
-
     if (state.cacheReloadTimer) {
       clearInterval(state.cacheReloadTimer);
+      state.cacheReloadTimer = undefined;
+    }
+
+    if (state.reloadIntervalMinutes <= 0) {
+      logger.info('Watchdog', `Periodic cache reload is disabled (0 mins) for display #${state.displayId}`);
+      return;
     }
 
     const intervalMs = state.reloadIntervalMinutes * 60 * 1000;
+    logger.info('Watchdog', `Scheduled forced cache purge & full reload every ${state.reloadIntervalMinutes} minutes for display #${state.displayId}`);
+
     state.cacheReloadTimer = setInterval(async () => {
       if (state.window.isDestroyed()) return;
-
-      logger.info('Watchdog', `Executing scheduled cache clear and reload for display #${state.displayId}`);
-      try {
-        const ses = state.window.webContents.session || session.defaultSession;
-        await ses.clearCache();
-        await ses.clearStorageData({ storages: ['cachestorage'] });
-      } catch (err) {
-        logger.warn('Watchdog', `Failed to purge cache for display #${state.displayId}:`, err);
-      }
-
-      state.lastReloadTime = new Date().toISOString();
-      const loadOptions = WatchdogService.buildLoadOptions(state.httpMethod, state.headers, state.requestBody);
-      state.window.loadURL(state.targetUrl, loadOptions).catch(() => {});
+      logger.info('Watchdog', `Executing scheduled forced full reload with cache purge for display #${state.displayId} (Interval: ${state.reloadIntervalMinutes}m)`);
+      await this.reloadDisplay(state.displayId, true);
     }, intervalMs);
   }
 
   /**
-   * Triggers immediate reload for a specific display.
+   * Executes a forced full reload for a specific display with optional complete cache purge.
+   * Uses hard cache-busting headers and webContents.reloadIgnoringCache() to ensure latest version.
    */
   public async reloadDisplay(displayId: number, clearCache: boolean = true): Promise<boolean> {
     const state = this.displayStates.get(displayId);
     if (!state || state.window.isDestroyed()) return false;
 
-    logger.info('Watchdog', `Manual reload triggered for display #${displayId} (clearCache=${clearCache})`);
+    logger.info('Watchdog', `Forced reload initiated for display #${displayId} (clearCache=${clearCache}) -> [${state.httpMethod || 'GET'}] ${state.targetUrl}`);
+    state.status = 'loading';
+
     if (clearCache) {
-      try {
-        const ses = state.window.webContents.session || session.defaultSession;
-        await ses.clearCache();
-      } catch {}
+      await WatchdogService.purgeSessionCache(state.window);
     }
 
     state.lastReloadTime = new Date().toISOString();
-    const loadOptions = WatchdogService.buildLoadOptions(state.httpMethod, state.headers, state.requestBody);
-    state.window.loadURL(state.targetUrl, loadOptions).catch(() => {});
+
+    const loadOptions = WatchdogService.buildLoadOptions(
+      state.httpMethod,
+      state.headers,
+      state.requestBody,
+      true
+    );
+
+    // If currently on target URL with standard GET and no custom body, use reloadIgnoringCache for hard reload
+    const currentUrl = state.window.webContents.getURL();
+    const isTargetUrl = currentUrl && currentUrl.startsWith(state.targetUrl.split('?')[0]);
+    const isStandardGet = (!state.httpMethod || state.httpMethod === 'GET') && (!state.headers || Object.keys(state.headers).length === 0) && !state.requestBody;
+
+    if (isTargetUrl && isStandardGet) {
+      try {
+        state.window.webContents.reloadIgnoringCache();
+        return true;
+      } catch (err) {
+        logger.warn('Watchdog', `reloadIgnoringCache failed for display #${displayId}, falling back to loadURL:`, err);
+      }
+    }
+
+    state.window.loadURL(state.targetUrl, loadOptions).catch((err) => {
+      logger.warn('Watchdog', `Forced reload loadURL failed for display #${displayId}:`, err);
+    });
+
     return true;
   }
 
   /**
-   * Triggers immediate reload for all active displays.
+   * Triggers immediate forced full reload with cache purge for all active displays.
    */
   public async reloadAll(clearCache: boolean = true): Promise<void> {
-    logger.info('Watchdog', `Manual reload triggered for ALL displays (clearCache=${clearCache})`);
+    logger.info('Watchdog', `Forced full reload triggered for ALL displays (clearCache=${clearCache})`);
     const promises = Array.from(this.displayStates.keys()).map((id) =>
       this.reloadDisplay(id, clearCache)
     );
     await Promise.all(promises);
+  }
+
+  /**
+   * Updates display configuration (URL, reload interval, retry interval, headers, etc.)
+   * and dynamically re-arms scheduled reload timers without restarting the window.
+   */
+  public updateDisplayConfig(
+    displayId: number,
+    options: {
+      targetUrl?: string;
+      fallbackUrl?: string;
+      reloadIntervalMinutes?: number;
+      retryIntervalSeconds?: number;
+      httpMethod?: 'GET' | 'POST' | 'PUT';
+      headers?: Record<string, string>;
+      requestBody?: string;
+      reloadNow?: boolean;
+    }
+  ): boolean {
+    const state = this.displayStates.get(displayId);
+    if (!state) return false;
+
+    if (options.targetUrl) {
+      state.targetUrl = options.targetUrl;
+      state.failureCount = 0;
+    }
+    if (options.fallbackUrl !== undefined) state.fallbackUrl = options.fallbackUrl;
+    if (options.httpMethod) state.httpMethod = options.httpMethod;
+    if (options.headers !== undefined) state.headers = options.headers;
+    if (options.requestBody !== undefined) state.requestBody = options.requestBody;
+    if (options.retryIntervalSeconds !== undefined) state.retryIntervalSeconds = options.retryIntervalSeconds;
+
+    let intervalChanged = false;
+    if (options.reloadIntervalMinutes !== undefined && options.reloadIntervalMinutes !== state.reloadIntervalMinutes) {
+      state.reloadIntervalMinutes = options.reloadIntervalMinutes;
+      intervalChanged = true;
+    }
+
+    if (intervalChanged) {
+      this.scheduleCacheReload(state);
+    }
+
+    if (options.reloadNow && !state.window.isDestroyed()) {
+      this.reloadDisplay(displayId, true);
+    }
+
+    return true;
   }
 
   /**
@@ -326,20 +423,13 @@ export class WatchdogService {
     headers?: Record<string, string>,
     requestBody?: string
   ): boolean {
-    const state = this.displayStates.get(displayId);
-    if (!state) return false;
-
-    state.targetUrl = newUrl;
-    state.failureCount = 0;
-    if (httpMethod) state.httpMethod = httpMethod;
-    if (headers !== undefined) state.headers = headers;
-    if (requestBody !== undefined) state.requestBody = requestBody;
-
-    if (reloadNow && !state.window.isDestroyed()) {
-      const loadOptions = WatchdogService.buildLoadOptions(state.httpMethod, state.headers, state.requestBody);
-      state.window.loadURL(newUrl, loadOptions).catch(() => {});
-    }
-    return true;
+    return this.updateDisplayConfig(displayId, {
+      targetUrl: newUrl,
+      reloadNow,
+      httpMethod,
+      headers,
+      requestBody,
+    });
   }
 
   /**

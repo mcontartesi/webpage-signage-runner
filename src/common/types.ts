@@ -86,7 +86,7 @@ export type WatchdogConfig = z.infer<typeof WatchdogConfigSchema>;
  */
 export const SignageConfigSchema = z.object({
   $schema: z.string().optional(),
-  version: z.string().default('1.1.1'),
+  version: z.string().default('1.1.2'),
   /** Default URL to assign when new displays are hotplugged or not configured */
   defaultUrl: z.string().url().default('https://www.youtube.com'),
   /** Global cursor hiding toggle */
@@ -212,5 +212,7 @@ export const IPC_CHANNELS = {
   RESTART_APP: 'signage:restart-app',
   CLOSE_SETUP: 'signage:close-setup',
   RETRY_DISPLAY: 'signage:retry-display',
+  RELOAD_DISPLAY: 'signage:reload-display',
+  RELOAD_ALL: 'signage:reload-all',
   QUIT_APP: 'signage:quit-app',
 } as const;

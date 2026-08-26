@@ -8,7 +8,8 @@ function getGitHubToken() {
   if (process.env.GITHUB_TOKEN) return process.env.GITHUB_TOKEN;
 
   try {
-    const creds = execSync('echo protocol=https\nhost=github.com | git credential fill', {
+    const creds = execSync('git credential fill', {
+      input: 'protocol=https\nhost=github.com\n\n',
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'ignore'],
     });
@@ -30,8 +31,13 @@ async function main() {
     process.exit(1);
   }
 
-  // Fetch latest release
-  const releasesRes = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`, {
+  const pkg = require('../package.json');
+  const version = pkg.version;
+  const tagName = `v${version}`;
+
+  // Check if release exists for current tag, or create it
+  let release;
+  const getReleaseRes = await fetch(`https://api.github.com/repos/${REPO}/releases/tags/${tagName}`, {
     headers: {
       Authorization: `token ${token}`,
       'User-Agent': 'node',
@@ -39,12 +45,47 @@ async function main() {
     },
   });
 
-  if (!releasesRes.ok) {
-    console.error('Failed to get latest release:', releasesRes.status);
+  if (getReleaseRes.ok) {
+    release = await getReleaseRes.json();
+    console.log(`Found existing release for ${tagName} (ID: ${release.id})`);
+  } else if (getReleaseRes.status === 404) {
+    console.log(`Release ${tagName} does not exist yet. Creating release...`);
+    const createRes = await fetch(`https://api.github.com/repos/${REPO}/releases`, {
+      method: 'POST',
+      headers: {
+        Authorization: `token ${token}`,
+        'User-Agent': 'node',
+        'Content-Type': 'application/json',
+        Accept: 'application/vnd.github.v3+json',
+      },
+      body: JSON.stringify({
+        tag_name: tagName,
+        target_commitish: 'main',
+        name: `Release ${tagName}`,
+        body: `## Webpage Signage Runner ${tagName}
+
+### Bug Fixes & Improvements
+- **Windows Reboot Config Persistence**: Fixed issue where display settings reverted to defaults upon Windows restart by adding multi-tier smart display matching (ID, screen index, primary flag, bounds).
+- **Application Exit Shortcuts**: Added support for closing the app using \`Ctrl + C\`, \`Ctrl + Q\`, and an **Exit App** button in the Setup Wizard.
+- **Process Resilience**: Clean signal handling (\`SIGINT\`, \`SIGTERM\`) to prevent orphaned background processes.
+`,
+        draft: false,
+        prerelease: false,
+      }),
+    });
+
+    if (!createRes.ok) {
+      const errBody = await createRes.text();
+      console.error(`Failed to create release: HTTP ${createRes.status} - ${errBody}`);
+      process.exit(1);
+    }
+    release = await createRes.json();
+    console.log(`Created release ${tagName} (ID: ${release.id})`);
+  } else {
+    console.error('Failed to check release:', getReleaseRes.status);
     process.exit(1);
   }
 
-  const release = await releasesRes.json();
   const releaseId = release.id;
   console.log(`Targeting release ${release.tag_name} (ID: ${releaseId})`);
 
@@ -54,8 +95,6 @@ async function main() {
     process.exit(1);
   }
 
-  const pkg = require('../package.json');
-  const version = pkg.version;
   const files = fs.readdirSync(releaseDir).filter((f) => {
     if (f === 'latest.yml' || f === 'latest-linux.yml') return true;
     return (
@@ -80,39 +119,26 @@ async function main() {
     const url = `https://uploads.github.com/repos/${REPO}/releases/${releaseId}/assets?name=${encodeURIComponent(fileName)}`;
 
     try {
-      await new Promise((resolve, reject) => {
-        const stream = fs.createReadStream(filePath);
-        const req = https.request(
-          url,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `token ${token}`,
-              'User-Agent': 'node',
-              'Content-Type': 'application/octet-stream',
-              'Content-Length': stat.size,
-            },
-          },
-          (res) => {
-            let body = '';
-            res.on('data', (chunk) => (body += chunk));
-            res.on('end', () => {
-              if (res.statusCode >= 200 && res.statusCode < 300) {
-                console.log(`✅ Uploaded ${fileName} successfully (status: ${res.statusCode})`);
-                resolve(JSON.parse(body));
-              } else if (res.statusCode === 422) {
-                console.log(`ℹ️ Asset ${fileName} already exists on this release.`);
-                resolve(null);
-              } else {
-                reject(new Error(`HTTP ${res.statusCode}: ${body}`));
-              }
-            });
-          }
-        );
-
-        req.on('error', (err) => reject(err));
-        stream.pipe(req);
+      const fileData = fs.readFileSync(filePath);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `token ${token}`,
+          'User-Agent': 'node',
+          'Content-Type': 'application/octet-stream',
+          'Content-Length': String(stat.size),
+        },
+        body: fileData,
       });
+
+      if (res.ok) {
+        console.log(`✅ Uploaded ${fileName} successfully (status: ${res.status})`);
+      } else if (res.status === 422) {
+        console.log(`ℹ️ Asset ${fileName} already exists on this release.`);
+      } else {
+        const errText = await res.text();
+        console.error(`❌ HTTP ${res.status}: ${errText}`);
+      }
     } catch (err) {
       console.error(`❌ Error uploading ${fileName}:`, err.message);
     }

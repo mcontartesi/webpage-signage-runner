@@ -253,8 +253,8 @@ If configured with an API token, include either:
     '/api/reload': {
       post: {
         tags: ['Display Management'],
-        summary: 'Reload All Connected Displays',
-        description: 'Triggers a coordinated reload and optional cache purge across all active screens.',
+        summary: 'Force Reload All Connected Displays',
+        description: 'Triggers a forced full hard reload and comprehensive cache purge (Chromium HTTP cache, Service Workers, CacheStorage) across all active screens to ensure the latest web version is always displayed.',
         requestBody: {
           required: false,
           content: {
@@ -264,7 +264,7 @@ If configured with an API token, include either:
                 properties: {
                   clearCache: {
                     type: 'boolean',
-                    description: 'Purge Chromium cache before reload',
+                    description: 'Purge Chromium HTTP cache, CacheStorage, and Service Workers before reload',
                     default: true,
                     example: true,
                   },

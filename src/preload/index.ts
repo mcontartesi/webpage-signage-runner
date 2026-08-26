@@ -11,6 +11,8 @@ export interface SignageAPI {
   restartApp: () => Promise<void>;
   closeSetup: () => Promise<ActionResponse>;
   retryDisplay: (displayId: number) => Promise<ActionResponse>;
+  reloadDisplay: (displayId: number, clearCache?: boolean) => Promise<ActionResponse>;
+  reloadAll: (clearCache?: boolean) => Promise<ActionResponse>;
   quitApp: () => Promise<ActionResponse>;
   platform: NodeJS.Platform;
 }
@@ -25,6 +27,8 @@ const api: SignageAPI = {
   restartApp: () => ipcRenderer.invoke(IPC_CHANNELS.RESTART_APP),
   closeSetup: () => ipcRenderer.invoke(IPC_CHANNELS.CLOSE_SETUP),
   retryDisplay: (displayId: number) => ipcRenderer.invoke(IPC_CHANNELS.RETRY_DISPLAY, displayId),
+  reloadDisplay: (displayId: number, clearCache: boolean = true) => ipcRenderer.invoke(IPC_CHANNELS.RELOAD_DISPLAY, displayId, clearCache),
+  reloadAll: (clearCache: boolean = true) => ipcRenderer.invoke(IPC_CHANNELS.RELOAD_ALL, clearCache),
   quitApp: () => ipcRenderer.invoke(IPC_CHANNELS.QUIT_APP),
   platform: process.platform,
 };

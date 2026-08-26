@@ -16,6 +16,7 @@ class SetupController {
   private displayCountBadge = document.getElementById('display-count-badge') as HTMLSpanElement;
   private btnIdentify = document.getElementById('btn-identify') as HTMLButtonElement;
   private btnRefresh = document.getElementById('btn-refresh') as HTMLButtonElement;
+  private btnReloadAll = document.getElementById('btn-reload-all') as HTMLButtonElement;
   private btnAbout = document.getElementById('btn-about') as HTMLButtonElement;
   private btnExit = document.getElementById('btn-exit') as HTMLButtonElement;
   private btnLogs = document.getElementById('btn-logs') as HTMLButtonElement;
@@ -60,6 +61,18 @@ class SetupController {
       await this.loadData();
       this.showToast('Refreshed display monitors list', 'success');
     });
+
+    if (this.btnReloadAll) {
+      this.btnReloadAll.addEventListener('click', async () => {
+        this.showToast('Purging cache & forcing reload on all displays...', 'success');
+        const res = await window.signageAPI.reloadAll(true);
+        if (res.success) {
+          this.showToast('All displays reloaded with fresh cache', 'success');
+        } else {
+          this.showToast(`Reload error: ${res.error || 'Failed'}`, 'error');
+        }
+      });
+    }
 
     if (this.btnAbout) {
       this.btnAbout.addEventListener('click', () => {
@@ -313,6 +326,7 @@ class SetupController {
           <div class="form-input-group">
             <input type="url" id="url-${display.id}" class="form-input font-mono display-url-input" value="${targetUrl}" placeholder="https://www.youtube.com" required>
             <button type="button" class="btn btn-secondary btn-small btn-test-url" data-target="url-${display.id}" title="Test URL connectivity">Test</button>
+            <button type="button" class="btn btn-secondary btn-small btn-reload-display" data-display-id="${display.id}" title="Purge cache and force reload this display">Reload</button>
           </div>
         </div>
 
@@ -425,6 +439,31 @@ class SetupController {
           testBtn.style.borderColor = '';
         }, 3500);
       });
+
+      // Attach reload display handler
+      const reloadBtn = card.querySelector('.btn-reload-display') as HTMLButtonElement;
+      if (reloadBtn) {
+        reloadBtn.addEventListener('click', async () => {
+          reloadBtn.textContent = 'Reloading...';
+          reloadBtn.disabled = true;
+          this.showToast(`Purging cache & reloading display #${display.id}...`, 'success');
+          const res = await window.signageAPI.reloadDisplay(display.id, true);
+          reloadBtn.disabled = false;
+          if (res.success) {
+            reloadBtn.textContent = 'Reloaded';
+            reloadBtn.style.color = '#34d399';
+            this.showToast(`Display #${display.id} reloaded with fresh cache`, 'success');
+          } else {
+            reloadBtn.textContent = 'Failed';
+            reloadBtn.style.color = '#f87171';
+            this.showToast(`Display #${display.id} reload failed: ${res.error || 'Display not found or inactive'}`, 'error');
+          }
+          setTimeout(() => {
+            reloadBtn.textContent = 'Reload';
+            reloadBtn.style.color = '';
+          }, 3500);
+        });
+      }
 
       // Enable/disable toggle
       const enableInput = card.querySelector('.display-enable-input') as HTMLInputElement;

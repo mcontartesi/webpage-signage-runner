@@ -4,7 +4,7 @@
 
 **Production-grade, unattended Multi-Display Digital Signage Kiosk orchestrator for Windows and Linux.**
 
-[![Release: v1.1.1](https://img.shields.io/badge/Release-v1.1.1-0ea5e9?logo=github&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/releases)
+[![Release: v1.1.2](https://img.shields.io/badge/Release-v1.1.2-0ea5e9?logo=github&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/releases)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-38bdf8?logo=googlechrome&logoColor=white)](https://mcontartesi.github.io/webpage-signage-runner/)
 [![Wiki Documentation](https://img.shields.io/badge/Documentation-GitHub%20Wiki-blueviolet?logo=gitbook&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/wiki)
 [![Downloads](https://img.shields.io/badge/Downloads-Windows%20%7C%20Linux-10b981?logo=windows&logoColor=white)](https://github.com/mcontartesi/webpage-signage-runner/releases)
@@ -40,17 +40,17 @@
 
 | Type | File | Description | Download |
 |---|---|---|---|
-| **Installer** | `Webpage-Signage-Runner-Setup-1.1.1-x64.exe` | Standard Windows Setup Wizard (with Desktop & Start Menu shortcuts, Autostart) | [⬇️ Download Installer](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Setup-1.1.1-x64.exe) |
-| **Portable** | `Webpage-Signage-Runner-Portable-1.1.1-x64.exe` | Standalone executable (runs directly from USB or folder, no installation required) | [⬇️ Download Portable](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Portable-1.1.1-x64.exe) |
+| **Installer** | `Webpage-Signage-Runner-Setup-1.1.2-x64.exe` | Standard Windows Setup Wizard (with Desktop & Start Menu shortcuts, Autostart) | [⬇️ Download Installer](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Setup-1.1.2-x64.exe) |
+| **Portable** | `Webpage-Signage-Runner-Portable-1.1.2-x64.exe` | Standalone executable (runs directly from USB or folder, no installation required) | [⬇️ Download Portable](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Portable-1.1.2-x64.exe) |
 
 ### 🐧 Linux (Ubuntu, Debian, Fedora, Arch, Raspberry Pi OS)
 
 | Package | File | Description | Download |
 |---|---|---|---|
-| **AppImage** | `webpage-signage-runner-1.1.1-x64.AppImage` | Universal Linux standalone binary (runs on all distributions) | [⬇️ Download AppImage](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.1-x64.AppImage) |
-| **Debian / Ubuntu** | `webpage-signage-runner-1.1.1-x64.deb` | Native `.deb` package for Ubuntu, Debian, Linux Mint | [⬇️ Download .deb](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.1-x64.deb) |
-| **Fedora / RHEL** | `webpage-signage-runner-1.1.1-x64.rpm` | Native `.rpm` package for Fedora, CentOS, Rocky Linux | [⬇️ Download .rpm](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.1-x64.rpm) |
-| **Tarball** | `webpage-signage-runner-1.1.1-x64.tar.gz` | Portable tarball archive | [⬇️ Download .tar.gz](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.1-x64.tar.gz) |
+| **AppImage** | `webpage-signage-runner-1.1.2-x64.AppImage` | Universal Linux standalone binary (runs on all distributions) | [⬇️ Download AppImage](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.2-x64.AppImage) |
+| **Debian / Ubuntu** | `webpage-signage-runner-1.1.2-x64.deb` | Native `.deb` package for Ubuntu, Debian, Linux Mint | [⬇️ Download .deb](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.2-x64.deb) |
+| **Fedora / RHEL** | `webpage-signage-runner-1.1.2-x64.rpm` | Native `.rpm` package for Fedora, CentOS, Rocky Linux | [⬇️ Download .rpm](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.2-x64.rpm) |
+| **Tarball** | `webpage-signage-runner-1.1.2-x64.tar.gz` | Portable tarball archive | [⬇️ Download .tar.gz](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.2-x64.tar.gz) |
 
 👉 **[View all Releases and Version Changelog on GitHub Releases](https://github.com/mcontartesi/webpage-signage-runner/releases)**
 
@@ -79,10 +79,10 @@
 - **First-Run Dark Mode Setup Wizard**: If no configuration exists, boots into an intuitive dark-mode setup wizard to discover screens, assign URLs (such as `https://www.youtube.com`, live dashboards, or internal web apps), configure zoom levels, and test connectivity.
 - **Advanced HTTP Requests & Authentication**: Supports `GET`, `POST`, and `PUT` request methods per display, allowing you to inject custom HTTP headers (such as `Authorization: Bearer <token>`, `X-Api-Key`, custom secrets) and raw request payloads into the initial and reload requests.
 - **Visual Screen Identification**: Flashes prominent screen index overlay numbers on all physical monitors at the click of a button so installers know exactly which monitor is which.
-- **Self-Healing Process Watchdog**:
+- **Self-Healing Process Watchdog & Forced Full Reload**:
   - Automatically intercepts network/loading failures and transitions to a branded **Offline Fallback UI** with live countdown timer and auto-retry loop.
   - Automatically restarts/recovers renderers on `unresponsive` or `render-process-gone` (crashes / OOM).
-  - Performs scheduled background cache purges (`reloadIntervalMinutes`) to eliminate Chromium 24/7 memory leaks.
+  - **Forced Full Page Reload with Cache Purge**: Defaults to every **60 minutes** (`reloadIntervalMinutes`), purging Chromium disk/memory cache, Service Workers, and CacheStorage, and executing a forced hard reload (`reloadIgnoringCache`) with cache-busting headers (`Cache-Control: no-cache, no-store, must-revalidate`) to guarantee screens always display the freshest version of web apps without memory bloat.
 - **Embedded HTTP REST & Health API with Swagger UI**: Integrated local server (default port `9191`) for health checks (`/health`), system status (`/api/status`), remote reloads, dynamic URL changes, live screenshot captures, and interactive Swagger UI documentation at `http://localhost:9191/`.
 - **OS Integration & Polishing**:
   - Prevents system sleep and monitor standby using `electron.powerSaveBlocker`.
@@ -299,7 +299,7 @@ For complete API documentation, headers, and `curl` examples, see [API.md](API.m
 
 - **Network Failures:** In case of connection dropout, displays automatically render `offline.html` showing diagnostics and an animated countdown before retrying. When the OS network adapter reconnects (`navigator.onLine`), it reloads immediately.
 - **Renderer Crashes / OOM:** The watchdog listens to `render-process-gone` and `unresponsive` events to automatically reboot the crashed display window without requiring an OS restart.
-- **Memory Purge:** Every `reloadIntervalMinutes`, Chromium's cache and memory storage are purged to avoid long-term JavaScript memory leaks in 24/7 setups.
+- **Periodic Forced Hard Reload & Cache Purge:** Every `reloadIntervalMinutes` (default: **60 minutes**), the runner completely purges Chromium HTTP disk/memory cache, Service Workers, and CacheStorage, performing an unconditional forced hard reload (`reloadIgnoringCache`) with cache-busting headers to ensure signage displays always reflect the latest web releases.
 - **Structured Logs:** Stored in `userData/logs/signage-YYYY-MM-DD.log` with automatic 7-day log retention.
 
 ---
@@ -331,10 +331,10 @@ Puedes probar el simulador web y asistente interactivo directamente desde tu nav
 
 ### 📥 Descargas Rápidas (Para Usuarios Finales)
 No se requieren conocimientos técnicos de programación ni Node.js. Descarga el ejecutable para tu sistema operativo:
-- **Windows Instalador (`.exe`):** [Descargar Instalador](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Setup-1.1.1-x64.exe)
-- **Windows Portable (`.exe`):** [Descargar Portable](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Portable-1.1.1-x64.exe)
-- **Linux AppImage:** [Descargar AppImage](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.1-x64.AppImage)
-- **Linux Debian / Ubuntu (`.deb`):** [Descargar .deb](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.1-x64.deb)
+- **Windows Instalador (`.exe`):** [Descargar Instalador](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Setup-1.1.2-x64.exe)
+- **Windows Portable (`.exe`):** [Descargar Portable](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/Webpage-Signage-Runner-Portable-1.1.2-x64.exe)
+- **Linux AppImage:** [Descargar AppImage](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.2-x64.AppImage)
+- **Linux Debian / Ubuntu (`.deb`):** [Descargar .deb](https://github.com/mcontartesi/webpage-signage-runner/releases/latest/download/webpage-signage-runner-1.1.2-x64.deb)
 
 ### Características Principales
 1. **Gestión Dinámica Multi-Monitor**: Detecta automáticamente todas las pantallas físicas conectadas y proyecta ventanas independientes sin bordes en modo Kiosk fijadas a las coordenadas exactas de cada pantalla.
@@ -342,11 +342,11 @@ No se requieren conocimientos técnicos de programación ni Node.js. Descarga el
 3. **Soporte Hot-Plug**: Maneja la conexión y desconexión de pantallas en caliente sin reiniciar la aplicación.
 4. **Asistente de Configuración Inicial (Dark Mode)**: Si no existe configuración previa, inicia un asistente visual para identificar monitores, probar URLs y configurar parámetros.
 5. **Identificación Visual de Pantallas**: Muestra números gigantes en cada monitor al presionar "Identify Screens" para facilitar la instalación física.
-6. **Watchdog y Autorecuperación**:
+6. **Watchdog y Recarga Forzada Total**:
    - Detecta fallos de red y muestra una pantalla offline con temporizador de reintento automático.
    - Recupera procesos colgados o caídos por falta de memoria (OOM).
-   - Limpia periódicamente la caché de Chromium para evitar fugas de memoria en funcionamiento 24/7.
-7. **API HTTP REST Embebida con Swagger UI (Puerto 9191)**: Permite monitoreo de estado, cambios remotos de URL, capturas de pantalla y reinicio. Incluye interfaz interactiva Swagger UI en `http://<ip>:9191/` (o `/docs`) para explorar y probar endpoints en vivo.
+   - **Recarga forzada total automática (por default cada 60 minutos)** con limpieza profunda de caché (HTTP, CacheStorage, Service Workers) y cabeceras de no-caché para tener siempre la última versión de la aplicación web sin fugas de memoria en 24/7.
+7. **API HTTP REST Embebida con Swagger UI (Puerto 9191)**: Permite monitoreo de estado, cambios remotos de URL, recarga forzada total, capturas de pantalla y reinicio. Incluye interfaz interactiva Swagger UI en `http://<ip>:9191/` (o `/docs`) para explorar y probar endpoints en vivo.
 8. **Arranque Automático con el Sistema**: Configuración integrada para iniciar junto con Windows o Linux.
 9. **Atajo de Emergencia**: Presiona **`Ctrl + Shift + C`** o **`CmdOrCtrl + Alt + S`** para salir del modo kiosk y abrir la configuración.
 
