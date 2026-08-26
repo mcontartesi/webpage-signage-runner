@@ -119,26 +119,44 @@ async function main() {
     const url = `https://uploads.github.com/repos/${REPO}/releases/${releaseId}/assets?name=${encodeURIComponent(fileName)}`;
 
     try {
-      const fileData = fs.readFileSync(filePath);
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          Authorization: `token ${token}`,
-          'User-Agent': 'node',
-          'Content-Type': 'application/octet-stream',
-          'Content-Length': String(stat.size),
-        },
-        body: fileData,
-      });
+      await new Promise((resolve, reject) => {
+        const stream = fs.createReadStream(filePath);
+        const req = https.request(
+          url,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `token ${token}`,
+              'User-Agent': 'node',
+              'Content-Type': 'application/octet-stream',
+              'Content-Length': stat.size,
+            },
+          },
+          (res) => {
+            let body = '';
+            res.on('data', (chunk) => (body += chunk));
+            res.on('end', () => {
+              if (res.statusCode >= 200 && res.statusCode < 300) {
+                console.log(`✅ Uploaded ${fileName} successfully (status: ${res.statusCode})`);
+                resolve(null);
+              } else if (res.statusCode === 422) {
+                console.log(`ℹ️ Asset ${fileName} already exists on this release.`);
+                resolve(null);
+              } else {
+                console.error(`❌ HTTP ${res.statusCode}: ${body}`);
+                resolve(null);
+              }
+            });
+          }
+        );
 
-      if (res.ok) {
-        console.log(`✅ Uploaded ${fileName} successfully (status: ${res.status})`);
-      } else if (res.status === 422) {
-        console.log(`ℹ️ Asset ${fileName} already exists on this release.`);
-      } else {
-        const errText = await res.text();
-        console.error(`❌ HTTP ${res.status}: ${errText}`);
-      }
+        req.on('error', (err) => {
+          console.error(`❌ Network error uploading ${fileName}:`, err.message);
+          resolve(null);
+        });
+
+        stream.pipe(req);
+      });
     } catch (err) {
       console.error(`❌ Error uploading ${fileName}:`, err.message);
     }
