@@ -10,15 +10,54 @@ export class ConfigManager {
   private currentConfig: SignageConfig | null = null;
 
   constructor(customPath?: string) {
+    this.configPath = this.resolveConfigPath(customPath);
+  }
+
+  private resolveConfigPath(customPath?: string): string {
     if (customPath) {
-      this.configPath = customPath;
-    } else {
-      try {
-        this.configPath = path.join(app.getPath('userData'), 'config.json');
-      } catch {
-        this.configPath = path.join(process.cwd(), 'config.json');
+      return customPath;
+    }
+
+    let defaultPath: string;
+    try {
+      defaultPath = path.join(app.getPath('userData'), 'config.json');
+    } catch {
+      defaultPath = path.join(process.cwd(), 'config.json');
+    }
+
+    if (fs.existsSync(defaultPath)) {
+      return defaultPath;
+    }
+
+    // Check alternate known paths where config might have been saved in prior sessions
+    const candidates: string[] = [];
+    const appData = process.env.APPDATA;
+    if (appData) {
+      candidates.push(path.join(appData, 'webpage-signage-runner', 'config.json'));
+      candidates.push(path.join(appData, 'Webpage Signage Runner', 'config.json'));
+    }
+    const home = process.env.HOME || process.env.USERPROFILE;
+    if (home) {
+      candidates.push(path.join(home, '.config', 'webpage-signage-runner', 'config.json'));
+    }
+    candidates.push(path.join(process.cwd(), 'config.json'));
+
+    for (const candidate of candidates) {
+      if (candidate !== defaultPath && fs.existsSync(candidate)) {
+        try {
+          const dir = path.dirname(defaultPath);
+          if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+          }
+          fs.copyFileSync(candidate, defaultPath);
+          return defaultPath;
+        } catch {
+          return candidate;
+        }
       }
     }
+
+    return defaultPath;
   }
 
   public getConfigPath(): string {
@@ -104,8 +143,16 @@ export class ConfigManager {
         } catch {}
       }
 
-      // Rename tmp to actual config
-      fs.renameSync(tempPath, this.configPath);
+      // Rename tmp to actual config with fallback for Windows file locks
+      try {
+        fs.renameSync(tempPath, this.configPath);
+      } catch {
+        fs.copyFileSync(tempPath, this.configPath);
+        try {
+          fs.unlinkSync(tempPath);
+        } catch {}
+      }
+
       this.currentConfig = validated;
       logger.info('Config', `Configuration successfully saved to ${this.configPath}`);
       return this.currentConfig;
@@ -121,14 +168,50 @@ export class ConfigManager {
   }
 
   /**
-   * Gets display config for a specific display ID, or returns a fallback config.
+   * Gets display config using multi-tier fallback matching across Windows reboots.
+   * Matches by: Exact ID -> displayIndex -> Single display fallback -> isPrimary -> screen bounds.
    */
-  public getDisplayConfig(displayId: number | string): DisplayConfig {
+  public getDisplayConfig(
+    displayId: number | string,
+    context?: { displayIndex?: number; isPrimary?: boolean; bounds?: { x: number; y: number; width: number; height: number } } | number
+  ): DisplayConfig {
     const config = this.get();
     const strId = String(displayId);
-    const found = config.displays.find((d) => String(d.id) === strId);
+
+    // 1. Direct exact ID match
+    let found = config.displays.find((d) => String(d.id) === strId);
+
+    const index = typeof context === 'number' ? context : context?.displayIndex;
+    const isPrimary = typeof context === 'object' ? context?.isPrimary : undefined;
+    const bounds = typeof context === 'object' ? context?.bounds : undefined;
+
+    // 2. Match by displayIndex (stable screen order)
+    if (!found && index !== undefined && index >= 0) {
+      found = config.displays.find((d) => d.displayIndex === index) || config.displays[index];
+    }
+
+    // 3. Match single-display kiosk setup
+    if (!found && config.displays.length === 1 && (index === 0 || index === undefined)) {
+      found = config.displays[0];
+    }
+
+    // 4. Match by isPrimary flag
+    if (!found && isPrimary !== undefined) {
+      found = config.displays.find((d) => d.isPrimary === isPrimary);
+    }
+
+    // 5. Match by physical display bounds (coordinates & resolution)
+    if (!found && bounds) {
+      found = config.displays.find(
+        (d) => d.bounds && d.bounds.x === bounds.x && d.bounds.y === bounds.y
+      );
+    }
 
     if (found) {
+      // In-memory update of runtime display ID if it changed across reboots
+      if (String(found.id) !== strId) {
+        found.id = displayId;
+      }
       return found;
     }
 
@@ -143,6 +226,9 @@ export class ConfigManager {
       hideCursor: config.hideCursorGlobal,
       zoomFactor: 1.0,
       enabled: true,
+      displayIndex: index,
+      isPrimary,
+      bounds,
     };
   }
 
@@ -174,6 +260,9 @@ export class ConfigManager {
         zoomFactor: partial.zoomFactor ?? 1.0,
         userAgent: partial.userAgent,
         partition: partial.partition,
+        displayIndex: partial.displayIndex,
+        isPrimary: partial.isPrimary,
+        bounds: partial.bounds,
         enabled: partial.enabled ?? true,
       };
       updatedDisplays = [...config.displays, newDisplay];

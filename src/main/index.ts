@@ -1,5 +1,5 @@
 import { app, powerSaveBlocker, globalShortcut, ipcMain, shell, net } from 'electron';
-import { CHROMIUM_FLAGS, DEFAULT_EMERGENCY_SHORTCUTS, APP_TITLE, APP_VERSION } from '../common/constants';
+import { CHROMIUM_FLAGS, DEFAULT_EMERGENCY_SHORTCUTS, APP_TITLE, APP_NAME, APP_VERSION } from '../common/constants';
 import { IPC_CHANNELS, SignageConfig, SaveConfigRequest, ActionResponse } from '../common/types';
 import { logger } from './logger';
 import { configManager } from './config';
@@ -7,6 +7,9 @@ import { windowManager } from './window-manager';
 import { watchdogService } from './watchdog';
 import { httpServer } from './server';
 import { autostartManager } from './autostart';
+
+// Explicitly set application name for consistent userData paths and Windows taskbar/shortcuts
+app.name = APP_NAME;
 
 // Apply Chromium performance, video autoplay, touch & kiosk command line flags
 for (const flag of CHROMIUM_FLAGS) {
@@ -16,6 +19,31 @@ for (const flag of CHROMIUM_FLAGS) {
   } else {
     app.commandLine.appendSwitch(flag.replace(/^--/, ''));
   }
+}
+
+// Handle termination signals (Ctrl+C from console, task managers, shutdown)
+const handleProcessTermination = (signal: string) => {
+  logger.info('Main', `Received termination signal ${signal}. Quitting application cleanly.`);
+  app.quit();
+};
+
+process.on('SIGINT', () => handleProcessTermination('SIGINT'));
+process.on('SIGTERM', () => handleProcessTermination('SIGTERM'));
+process.on('SIGBREAK', () => handleProcessTermination('SIGBREAK'));
+process.on('SIGHUP', () => handleProcessTermination('SIGHUP'));
+
+// On Windows, hook readline for console Ctrl+C if standard input is a TTY
+if (process.platform === 'win32' && process.stdin.isTTY) {
+  try {
+    const readline = require('readline');
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+    rl.on('SIGINT', () => {
+      handleProcessTermination('SIGINT (readline)');
+    });
+  } catch {}
 }
 
 // Ensure single instance lock for unattended kiosk operation
@@ -177,6 +205,13 @@ function registerIpcHandlers(): void {
   // 9. Retry display load
   ipcMain.handle(IPC_CHANNELS.RETRY_DISPLAY, (_event, displayId: number) => {
     watchdogService.retryDisplay(displayId);
+    return { success: true };
+  });
+
+  // 10. Quit application cleanly
+  ipcMain.handle(IPC_CHANNELS.QUIT_APP, () => {
+    logger.info('Main', 'Quit application requested via IPC');
+    app.quit();
     return { success: true };
   });
 }

@@ -57,7 +57,7 @@ describe('ConfigManager & Zod Schema', () => {
 
   it('should validate complete SignageConfigSchema', () => {
     const rawConfig = {
-      version: '1.1.0',
+      version: '1.1.1',
       defaultUrl: 'https://www.youtube.com',
       autoStartOnBoot: true,
       api: {
@@ -73,7 +73,7 @@ describe('ConfigManager & Zod Schema', () => {
     };
 
     const parsed = SignageConfigSchema.parse(rawConfig);
-    expect(parsed.version).toBe('1.1.0');
+    expect(parsed.version).toBe('1.1.1');
     expect(parsed.api.port).toBe(9191);
     expect(parsed.api.host).toBe('0.0.0.0');
     expect(parsed.displays.length).toBe(1);
@@ -142,5 +142,82 @@ describe('ConfigManager & Zod Schema', () => {
 
     manager.reset();
     expect(manager.hasConfigFile()).toBe(false);
+  });
+
+  it('should resolve display config across reboots with changed display IDs using smart matching', () => {
+    const manager = new ConfigManager(tempConfigPath);
+    // User configured display with ID 2528732487 (Windows runtime ID on session 1)
+    manager.save({
+      defaultUrl: 'https://youtube.com',
+      displays: [
+        {
+          id: 2528732487,
+          displayIndex: 0,
+          isPrimary: true,
+          bounds: { x: 0, y: 0, width: 1920, height: 1080 },
+          url: 'https://custom-signage.example.com',
+          httpMethod: 'GET',
+          reloadIntervalMinutes: 30,
+          retryIntervalSeconds: 15,
+          hideCursor: true,
+          zoomFactor: 1.25,
+          enabled: true,
+        },
+        {
+          id: 2528732488,
+          displayIndex: 1,
+          isPrimary: false,
+          bounds: { x: 1920, y: 0, width: 1920, height: 1080 },
+          url: 'https://secondary-feed.example.com',
+          httpMethod: 'GET',
+          reloadIntervalMinutes: 45,
+          retryIntervalSeconds: 10,
+          hideCursor: true,
+          zoomFactor: 1.0,
+          enabled: true,
+        },
+      ],
+    });
+
+    // On session 2 after Windows reboot, Electron assigns new display IDs (e.g. 77770001 and 77770002)
+    const rebootedDisplay1 = manager.getDisplayConfig(77770001, {
+      displayIndex: 0,
+      isPrimary: true,
+      bounds: { x: 0, y: 0, width: 1920, height: 1080 },
+    });
+    expect(rebootedDisplay1.url).toBe('https://custom-signage.example.com');
+    expect(rebootedDisplay1.zoomFactor).toBe(1.25);
+
+    const rebootedDisplay2 = manager.getDisplayConfig(77770002, {
+      displayIndex: 1,
+      isPrimary: false,
+      bounds: { x: 1920, y: 0, width: 1920, height: 1080 },
+    });
+    expect(rebootedDisplay2.url).toBe('https://secondary-feed.example.com');
+    expect(rebootedDisplay2.reloadIntervalMinutes).toBe(45);
+  });
+
+  it('should resolve single-display kiosk setup when display ID changes on reboot', () => {
+    const manager = new ConfigManager(tempConfigPath);
+    manager.save({
+      defaultUrl: 'https://default-youtube.com',
+      displays: [
+        {
+          id: 11112222,
+          url: 'https://solo-kiosk.example.com',
+          httpMethod: 'GET',
+          reloadIntervalMinutes: 20,
+          retryIntervalSeconds: 8,
+          hideCursor: true,
+          zoomFactor: 1.5,
+          enabled: true,
+        },
+      ],
+    });
+
+    // On reboot, single screen gets ID 99998888
+    const singleScreenConfig = manager.getDisplayConfig(99998888, { displayIndex: 0 });
+    expect(singleScreenConfig.url).toBe('https://solo-kiosk.example.com');
+    expect(singleScreenConfig.zoomFactor).toBe(1.5);
   });
 });

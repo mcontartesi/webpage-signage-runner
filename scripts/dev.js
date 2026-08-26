@@ -26,6 +26,18 @@ buildProc.on('close', (code) => {
     },
   });
 
+  const cleanExit = () => {
+    if (electronProc && !electronProc.killed) {
+      try {
+        electronProc.kill('SIGINT');
+      } catch {}
+    }
+    process.exit(0);
+  };
+
+  process.on('SIGINT', cleanExit);
+  process.on('SIGTERM', cleanExit);
+
   electronProc.on('close', () => {
     process.exit(0);
   });

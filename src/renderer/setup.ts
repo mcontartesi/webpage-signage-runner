@@ -17,6 +17,7 @@ class SetupController {
   private btnIdentify = document.getElementById('btn-identify') as HTMLButtonElement;
   private btnRefresh = document.getElementById('btn-refresh') as HTMLButtonElement;
   private btnAbout = document.getElementById('btn-about') as HTMLButtonElement;
+  private btnExit = document.getElementById('btn-exit') as HTMLButtonElement;
   private btnLogs = document.getElementById('btn-logs') as HTMLButtonElement;
   private btnSave = document.getElementById('btn-save') as HTMLButtonElement;
   private statusToast = document.getElementById('status-toast') as HTMLDivElement;
@@ -63,6 +64,12 @@ class SetupController {
     if (this.btnAbout) {
       this.btnAbout.addEventListener('click', () => {
         this.openAboutModal();
+      });
+    }
+
+    if (this.btnExit) {
+      this.btnExit.addEventListener('click', async () => {
+        await window.signageAPI.quitApp();
       });
     }
 
@@ -136,11 +143,15 @@ class SetupController {
       });
     });
 
-    // Global keyboard shortcut: Ctrl+S / Cmd+S to save
+    // Global keyboard shortcuts: Ctrl+S to save, Ctrl+Q to quit, Escape for modal
     window.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
         e.preventDefault();
         this.saveAndLaunch();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'q') {
+        e.preventDefault();
+        window.signageAPI.quitApp();
       }
       if (e.key === 'Escape' && this.aboutModal && !this.aboutModal.classList.contains('hidden')) {
         this.closeAboutModal();
@@ -247,8 +258,26 @@ class SetupController {
     }
 
     this.displays.forEach((display, index) => {
-      // Find existing config or synthesize defaults
-      const existingConfig = this.config.displays.find((d) => String(d.id) === String(display.id));
+      // Find existing config using multi-tier smart matching
+      let existingConfig = this.config.displays.find((d) => String(d.id) === String(display.id));
+      if (!existingConfig && this.config.displays.find((d) => d.displayIndex === index)) {
+        existingConfig = this.config.displays.find((d) => d.displayIndex === index);
+      }
+      if (!existingConfig && this.config.displays[index]) {
+        existingConfig = this.config.displays[index];
+      }
+      if (!existingConfig && this.displays.length === 1 && this.config.displays.length >= 1) {
+        existingConfig = this.config.displays[0];
+      }
+      if (!existingConfig && display.isPrimary) {
+        existingConfig = this.config.displays.find((d) => d.isPrimary);
+      }
+      if (!existingConfig && display.bounds) {
+        existingConfig = this.config.displays.find(
+          (d) => d.bounds && d.bounds.x === display.bounds.x && d.bounds.y === display.bounds.y
+        );
+      }
+
       const targetUrl = existingConfig?.url || this.config.defaultUrl || 'https://www.youtube.com';
       const httpMethod = existingConfig?.httpMethod || 'GET';
       const headersStr = this.formatHeadersToString(existingConfig?.headers);
@@ -422,7 +451,8 @@ class SetupController {
     const displaysConfig: DisplayConfig[] = [];
     const displayCards = this.displaysContainer.querySelectorAll('.display-card') as NodeListOf<HTMLDivElement>;
 
-    for (const card of displayCards) {
+    for (let index = 0; index < displayCards.length; index++) {
+      const card = displayCards[index];
       const displayId = card.dataset.displayId!;
       const urlInput = card.querySelector('.display-url-input') as HTMLInputElement;
       const methodSelect = card.querySelector('.display-method-input') as HTMLSelectElement;
@@ -445,9 +475,13 @@ class SetupController {
       const httpMethod = (methodSelect?.value as 'GET' | 'POST' | 'PUT') || 'GET';
       const parsedHeaders = headersInput ? this.parseHeadersFromString(headersInput.value) : undefined;
       const requestBody = bodyInput ? bodyInput.value.trim() || undefined : undefined;
+      const matchedDisplay = this.displays.find((d) => String(d.id) === String(displayId)) || this.displays[index];
 
       displaysConfig.push({
         id: isNaN(Number(displayId)) ? displayId : Number(displayId),
+        displayIndex: index,
+        isPrimary: matchedDisplay?.isPrimary ?? (index === 0),
+        bounds: matchedDisplay ? { ...matchedDisplay.bounds } : undefined,
         url: targetUrl,
         httpMethod,
         headers: parsedHeaders,
@@ -462,7 +496,7 @@ class SetupController {
     }
 
     const payloadConfig: SignageConfig = {
-      version: '1.0.0',
+      version: this.config?.version || '1.1.0',
       defaultUrl: globalDefaultUrl,
       hideCursorGlobal: this.inputGlobalHideCursor.checked,
       defaultReloadIntervalMinutes: parseInt(this.inputWatchdogReload.value, 10) || 60,

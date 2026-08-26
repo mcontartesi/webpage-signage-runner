@@ -66,15 +66,15 @@ export class WindowManager {
       }
     }
 
-    for (const display of displays) {
-      this.createKioskWindowForDisplay(display);
-    }
+    displays.forEach((display, index) => {
+      this.createKioskWindowForDisplay(display, index);
+    });
   }
 
   /**
    * Creates and pins a borderless fullscreen kiosk window to a specific physical display.
    */
-  public createKioskWindowForDisplay(display: Display): BrowserWindow {
+  public createKioskWindowForDisplay(display: Display, displayIndex?: number): BrowserWindow {
     // If window already exists for this display, reuse/update it
     let win = this.kioskWindows.get(display.id);
     if (win && !win.isDestroyed()) {
@@ -82,8 +82,16 @@ export class WindowManager {
       return win;
     }
 
+    const displays = screen.getAllDisplays();
+    const index = displayIndex !== undefined ? displayIndex : displays.findIndex((d) => d.id === display.id);
+    const isPrimary = display.id === screen.getPrimaryDisplay().id;
+
     const config = configManager.get();
-    const displayConf = configManager.getDisplayConfig(display.id);
+    const displayConf = configManager.getDisplayConfig(display.id, {
+      displayIndex: index >= 0 ? index : undefined,
+      isPrimary,
+      bounds: display.bounds,
+    });
 
     if (!displayConf.enabled) {
       logger.info('WindowManager', `Display #${display.id} is disabled in config. Skipping.`);
@@ -115,6 +123,30 @@ export class WindowManager {
         backgroundThrottling: false,
         partition: displayConf.partition || undefined,
       },
+    });
+
+    // Handle kiosk keyboard shortcuts (Ctrl+C, Ctrl+Q, Cmd+Q to quit, Ctrl+Shift+C for Setup)
+    win.webContents.on('before-input-event', (event, input) => {
+      if (input.type === 'keyDown') {
+        const isCtrlOrCmd = input.control || input.meta;
+        const key = input.key.toLowerCase();
+
+        // Emergency Quit on Ctrl+C, Ctrl+Q, Cmd+Q, Ctrl+W
+        if (isCtrlOrCmd && !input.shift && (key === 'c' || key === 'q' || key === 'w')) {
+          event.preventDefault();
+          logger.info('WindowManager', `Quit shortcut triggered in kiosk window (${isCtrlOrCmd ? 'Ctrl' : ''}+${key.toUpperCase()}). Quitting.`);
+          app.quit();
+          return;
+        }
+
+        // Emergency setup hotkey (Ctrl+Shift+C or Ctrl+Alt+S)
+        if ((isCtrlOrCmd && input.shift && key === 'c') || (isCtrlOrCmd && input.alt && key === 's')) {
+          event.preventDefault();
+          logger.info('WindowManager', `Emergency setup hotkey triggered in kiosk window (${input.key}).`);
+          this.openSetupWindow();
+          return;
+        }
+      }
     });
 
     // Explicitly pin bounds and kiosk state
@@ -212,8 +244,14 @@ export class WindowManager {
     logger.info('WindowManager', 'Applying new configuration to displays...');
     const displays = screen.getAllDisplays();
 
-    for (const display of displays) {
-      const displayConf = configManager.getDisplayConfig(display.id);
+    for (let i = 0; i < displays.length; i++) {
+      const display = displays[i];
+      const isPrimary = display.id === screen.getPrimaryDisplay().id;
+      const displayConf = configManager.getDisplayConfig(display.id, {
+        displayIndex: i,
+        isPrimary,
+        bounds: display.bounds,
+      });
       const win = this.kioskWindows.get(display.id);
 
       if (!displayConf.enabled) {
@@ -222,7 +260,7 @@ export class WindowManager {
       }
 
       if (!win || win.isDestroyed()) {
-        this.createKioskWindowForDisplay(display);
+        this.createKioskWindowForDisplay(display, i);
       } else {
         const targetUrl = displayConf.url || newConfig.defaultUrl;
         watchdogService.updateTargetUrl(
@@ -274,6 +312,22 @@ export class WindowManager {
         nodeIntegration: false,
         sandbox: true,
       },
+    });
+
+    // Handle setup window keyboard shortcuts (Ctrl+Q to quit)
+    this.setupWindow.webContents.on('before-input-event', (event, input) => {
+      if (input.type === 'keyDown') {
+        const isCtrlOrCmd = input.control || input.meta;
+        const key = input.key.toLowerCase();
+
+        // Ctrl+Q / Cmd+Q quits application
+        if (isCtrlOrCmd && key === 'q') {
+          event.preventDefault();
+          logger.info('WindowManager', 'Quit shortcut triggered in setup window (Ctrl+Q). Exiting.');
+          app.quit();
+          return;
+        }
+      }
     });
 
     this.setupWindow.loadFile(setupHtmlPath);
@@ -352,15 +406,20 @@ export class WindowManager {
     const displays = screen.getAllDisplays();
     const primaryId = screen.getPrimaryDisplay().id;
 
-    return displays.map((d) => {
+    return displays.map((d, index) => {
+      const isPrimary = d.id === primaryId;
       const state = watchdogService.getState(d.id);
-      const conf = configManager.getDisplayConfig(d.id);
+      const conf = configManager.getDisplayConfig(d.id, {
+        displayIndex: index,
+        isPrimary,
+        bounds: d.bounds,
+      });
 
       return {
         id: d.id,
         label: conf.label || `Display ${d.id}`,
         bounds: d.bounds,
-        isPrimary: d.id === primaryId,
+        isPrimary,
         currentUrl: state?.targetUrl || conf.url,
         status: state?.status || 'idle',
         lastReload: state?.lastReloadTime || null,
@@ -377,8 +436,13 @@ export class WindowManager {
     const displays = screen.getAllDisplays();
     const primaryId = screen.getPrimaryDisplay().id;
 
-    return displays.map((d) => {
-      const conf = configManager.getDisplayConfig(d.id);
+    return displays.map((d, index) => {
+      const isPrimary = d.id === primaryId;
+      const conf = configManager.getDisplayConfig(d.id, {
+        displayIndex: index,
+        isPrimary,
+        bounds: d.bounds,
+      });
       const state = watchdogService.getState(d.id);
 
       return {
@@ -388,7 +452,7 @@ export class WindowManager {
         workArea: d.workArea,
         scaleFactor: d.scaleFactor,
         rotation: d.rotation,
-        isPrimary: d.id === primaryId,
+        isPrimary,
         internal: d.internal,
         configuredUrl: conf.url,
         status: state?.status || 'idle',

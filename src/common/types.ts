@@ -30,6 +30,17 @@ export const DisplayConfigSchema = z.object({
   userAgent: z.string().optional(),
   /** Isolated partition name for separate cookies/localstorage per display */
   partition: z.string().optional(),
+  /** Zero-based display index in the connected display list for stable reboot matching */
+  displayIndex: z.number().int().min(0).optional(),
+  /** Whether this display is the primary operating system monitor */
+  isPrimary: z.boolean().optional(),
+  /** Physical screen coordinates and dimensions for resilient reboot matching */
+  bounds: z.object({
+    x: z.number(),
+    y: z.number(),
+    width: z.number(),
+    height: z.number(),
+  }).optional(),
   /** Whether this screen is actively managed */
   enabled: z.boolean().default(true),
 });
@@ -75,7 +86,7 @@ export type WatchdogConfig = z.infer<typeof WatchdogConfigSchema>;
  */
 export const SignageConfigSchema = z.object({
   $schema: z.string().optional(),
-  version: z.string().default('1.1.0'),
+  version: z.string().default('1.1.1'),
   /** Default URL to assign when new displays are hotplugged or not configured */
   defaultUrl: z.string().url().default('https://www.youtube.com'),
   /** Global cursor hiding toggle */
@@ -201,4 +212,5 @@ export const IPC_CHANNELS = {
   RESTART_APP: 'signage:restart-app',
   CLOSE_SETUP: 'signage:close-setup',
   RETRY_DISPLAY: 'signage:retry-display',
+  QUIT_APP: 'signage:quit-app',
 } as const;
