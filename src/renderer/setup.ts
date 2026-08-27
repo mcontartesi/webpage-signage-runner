@@ -7,6 +7,16 @@ declare global {
   }
 }
 
+function escapeHtml(str: unknown): string {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 class SetupController {
   private config!: SignageConfig;
   private displays: RuntimeDisplayInfo[] = [];
@@ -311,8 +321,8 @@ class SetupController {
           <div class="display-info">
             <div class="display-badge-number">${index + 1}</div>
             <div class="display-headings">
-              <div class="display-label">${display.label || `Display #${display.id}`}</div>
-              <div class="display-meta">${display.bounds.width} × ${display.bounds.height} @ (${display.bounds.x}, ${display.bounds.y}) • Scale: ${display.scaleFactor}x</div>
+              <div class="display-label">${escapeHtml(display.label || `Display #${display.id}`)}</div>
+              <div class="display-meta">${escapeHtml(display.bounds.width)} × ${escapeHtml(display.bounds.height)} @ (${escapeHtml(display.bounds.x)}, ${escapeHtml(display.bounds.y)}) • Scale: ${escapeHtml(display.scaleFactor)}x</div>
             </div>
           </div>
           <div class="display-tags">
@@ -322,11 +332,11 @@ class SetupController {
         </div>
 
         <div class="form-group">
-          <label for="url-${display.id}">Target Signage URL</label>
+          <label for="url-${escapeHtml(display.id)}">Target Signage URL</label>
           <div class="form-input-group">
-            <input type="url" id="url-${display.id}" class="form-input font-mono display-url-input" value="${targetUrl}" placeholder="https://www.youtube.com" required>
-            <button type="button" class="btn btn-secondary btn-small btn-test-url" data-target="url-${display.id}" title="Test URL connectivity">Test</button>
-            <button type="button" class="btn btn-secondary btn-small btn-reload-display" data-display-id="${display.id}" title="Purge cache and force reload this display">Reload</button>
+            <input type="url" id="url-${escapeHtml(display.id)}" class="form-input font-mono display-url-input" value="${escapeHtml(targetUrl)}" placeholder="https://www.youtube.com" required>
+            <button type="button" class="btn btn-secondary btn-small btn-test-url" data-target="url-${escapeHtml(display.id)}" title="Test URL connectivity">Test</button>
+            <button type="button" class="btn btn-secondary btn-small btn-reload-display" data-display-id="${escapeHtml(display.id)}" title="Purge cache and force reload this display">Reload</button>
           </div>
         </div>
 
@@ -345,8 +355,8 @@ class SetupController {
           <div class="details-content">
             <div class="form-row">
               <div class="form-group flex-1">
-                <label for="method-${display.id}">HTTP Method</label>
-                <select id="method-${display.id}" class="form-select display-method-input">
+                <label for="method-${escapeHtml(display.id)}">HTTP Method</label>
+                <select id="method-${escapeHtml(display.id)}" class="form-select display-method-input">
                   <option value="GET" ${httpMethod === 'GET' ? 'selected' : ''}>GET</option>
                   <option value="POST" ${httpMethod === 'POST' ? 'selected' : ''}>POST</option>
                   <option value="PUT" ${httpMethod === 'PUT' ? 'selected' : ''}>PUT</option>
@@ -355,42 +365,42 @@ class SetupController {
             </div>
 
             <div class="form-group">
-              <label for="headers-${display.id}">Custom HTTP Headers (Auth Token, Headers)</label>
-              <textarea id="headers-${display.id}" class="form-textarea display-headers-input" placeholder="Authorization: Bearer your-secret-token\nX-Custom-Auth: secret123">${headersStr}</textarea>
+              <label for="headers-${escapeHtml(display.id)}">Custom HTTP Headers (Auth Token, Headers)</label>
+              <textarea id="headers-${escapeHtml(display.id)}" class="form-textarea display-headers-input" placeholder="Authorization: Bearer your-secret-token\nX-Custom-Auth: secret123">${escapeHtml(headersStr)}</textarea>
               <span class="form-hint">One header per line (<code>Header: Value</code>) or JSON format.</span>
             </div>
 
             <div class="form-group">
-              <label for="body-${display.id}">Request Body (Payload for POST / PUT)</label>
-              <textarea id="body-${display.id}" class="form-textarea display-body-input" placeholder='{"kiosk": 1, "station": "A"}'>${requestBody}</textarea>
+              <label for="body-${escapeHtml(display.id)}">Request Body (Payload for POST / PUT)</label>
+              <textarea id="body-${escapeHtml(display.id)}" class="form-textarea display-body-input" placeholder='{"kiosk": 1, "station": "A"}'>${escapeHtml(requestBody)}</textarea>
             </div>
           </div>
         </details>
 
         <div class="form-group">
-          <label for="fallback-${display.id}">Fallback Offline Asset / URL (Optional)</label>
-          <input type="text" id="fallback-${display.id}" class="form-input font-mono display-fallback-input" value="${fallbackUrl}" placeholder="file:///path/or/url">
+          <label for="fallback-${escapeHtml(display.id)}">Fallback Offline Asset / URL (Optional)</label>
+          <input type="text" id="fallback-${escapeHtml(display.id)}" class="form-input font-mono display-fallback-input" value="${escapeHtml(fallbackUrl)}" placeholder="file:///path/or/url">
         </div>
 
         <div class="form-row">
           <div class="form-group flex-1">
-            <label for="reload-${display.id}">Reload (Mins)</label>
-            <input type="number" id="reload-${display.id}" class="form-input display-reload-input" value="${reloadMins}" min="0">
+            <label for="reload-${escapeHtml(display.id)}">Reload (Mins)</label>
+            <input type="number" id="reload-${escapeHtml(display.id)}" class="form-input display-reload-input" value="${escapeHtml(reloadMins)}" min="0">
           </div>
           <div class="form-group flex-1">
-            <label for="retry-${display.id}">Retry (Secs)</label>
-            <input type="number" id="retry-${display.id}" class="form-input display-retry-input" value="${retrySecs}" min="3" max="300">
+            <label for="retry-${escapeHtml(display.id)}">Retry (Secs)</label>
+            <input type="number" id="retry-${escapeHtml(display.id)}" class="form-input display-retry-input" value="${escapeHtml(retrySecs)}" min="3" max="300">
           </div>
           <div class="form-group flex-1">
-            <label for="zoom-${display.id}">Zoom (Scale)</label>
-            <input type="number" id="zoom-${display.id}" class="form-input display-zoom-input" value="${zoomFactor}" min="0.2" max="3.0" step="0.1">
+            <label for="zoom-${escapeHtml(display.id)}">Zoom (Scale)</label>
+            <input type="number" id="zoom-${escapeHtml(display.id)}" class="form-input display-zoom-input" value="${escapeHtml(zoomFactor)}" min="0.2" max="3.0" step="0.1">
           </div>
         </div>
 
         <div class="display-card-footer">
           <div class="toggle-row" style="padding: 0;">
             <label class="toggle-switch">
-              <input type="checkbox" id="cursor-${display.id}" class="display-cursor-input" ${hideCursor ? 'checked' : ''}>
+              <input type="checkbox" id="cursor-${escapeHtml(display.id)}" class="display-cursor-input" ${hideCursor ? 'checked' : ''}>
               <span class="toggle-slider"></span>
             </label>
             <div class="toggle-info">
@@ -400,7 +410,7 @@ class SetupController {
 
           <div class="toggle-row" style="padding: 0;">
             <label class="toggle-switch">
-              <input type="checkbox" id="enabled-${display.id}" class="display-enable-input" ${enabled ? 'checked' : ''}>
+              <input type="checkbox" id="enabled-${escapeHtml(display.id)}" class="display-enable-input" ${enabled ? 'checked' : ''}>
               <span class="toggle-slider"></span>
             </label>
             <div class="toggle-info">

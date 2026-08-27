@@ -548,8 +548,6 @@ If configured with an API token, include either:
  * and embedded OpenAPI specification.
  */
 export function getSwaggerHtml(): string {
-  const specJson = JSON.stringify(OPENAPI_SPEC);
-
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -833,12 +831,10 @@ export function getSwaggerHtml(): string {
   <script src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-bundle.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-standalone-preset.js" crossorigin="anonymous"></script>
   <script>
-    const spec = ${specJson};
-
     window.onload = () => {
       if (typeof SwaggerUIBundle !== 'undefined') {
         window.ui = SwaggerUIBundle({
-          spec: spec,
+          url: '/openapi.json',
           dom_id: '#swagger-ui',
           deepLinking: true,
           presets: [

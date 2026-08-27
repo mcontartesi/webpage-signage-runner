@@ -125,6 +125,11 @@ export class WindowManager {
       },
     });
 
+    // Block any unexpected new window creation (window.open / target="_blank")
+    win.webContents.setWindowOpenHandler(() => {
+      return { action: 'deny' };
+    });
+
     // Handle kiosk keyboard shortcuts (Ctrl+C, Ctrl+Q, Cmd+Q to quit, Ctrl+Shift+C for Setup)
     win.webContents.on('before-input-event', (event, input) => {
       if (input.type === 'keyDown') {
@@ -371,6 +376,7 @@ export class WindowManager {
         webPreferences: {
           contextIsolation: true,
           nodeIntegration: false,
+          sandbox: true,
         },
       });
 

@@ -218,25 +218,25 @@ class SignageDemoApp {
           <div class="display-info">
             <div class="display-badge-number">${index + 1}</div>
             <div>
-              <div class="display-label">${display.label}</div>
-              <div class="display-meta">${display.bounds.width} × ${display.bounds.height} @ (${display.bounds.x}, ${display.bounds.y}) • Scale: ${display.scaleFactor}x</div>
+              <div class="display-label">${this.escapeHtml(display.label)}</div>
+              <div class="display-meta">${this.escapeHtml(display.bounds.width)} × ${this.escapeHtml(display.bounds.height)} @ (${this.escapeHtml(display.bounds.x)}, ${this.escapeHtml(display.bounds.y)}) • Scale: ${this.escapeHtml(display.scaleFactor)}x</div>
             </div>
           </div>
           <div class="display-tags">
             ${display.isPrimary ? '<span class="badge badge-primary">Primary</span>' : '<span class="badge badge-secondary">Secondary</span>'}
             <span class="badge badge-success">Online</span>
-            ${this.displays.length > 1 ? `<button class="btn btn-danger btn-small btn-remove-display" data-id="${display.id}" title="Remove Display">&times;</button>` : ''}
+            ${this.displays.length > 1 ? `<button class="btn btn-danger btn-small btn-remove-display" data-id="${this.escapeHtml(display.id)}" title="Remove Display">&times;</button>` : ''}
           </div>
         </div>
 
         <div class="form-group">
           <label>Target Signage URL / Web Application</label>
           <div class="form-input-group">
-            <input type="url" class="form-input display-url-input" value="${display.url}" placeholder="https://www.youtube.com">
+            <input type="url" class="form-input display-url-input" value="${this.escapeHtml(display.url)}" placeholder="https://www.youtube.com">
             <button type="button" class="btn btn-secondary btn-small btn-test-url">Test</button>
           </div>
           <div class="url-preset-pills">
-            ${PRESETS.map(p => `<button type="button" class="preset-pill" data-url="${p.url}" data-method="${p.method}" data-headers="${p.headers || ''}">${p.label}</button>`).join('')}
+            ${PRESETS.map(p => `<button type="button" class="preset-pill" data-url="${this.escapeHtml(p.url)}" data-method="${this.escapeHtml(p.method)}" data-headers="${this.escapeHtml(p.headers || '')}">${this.escapeHtml(p.label)}</button>`).join('')}
           </div>
         </div>
 
@@ -261,11 +261,11 @@ class SignageDemoApp {
             </div>
             <div class="form-group">
               <label>Custom HTTP Headers (e.g. Bearer Token, API Secret)</label>
-              <textarea class="form-textarea display-headers-input" placeholder="Authorization: Bearer secret-token\nX-Client: 123">${display.headers || ''}</textarea>
+              <textarea class="form-textarea display-headers-input" placeholder="Authorization: Bearer secret-token\nX-Client: 123">${this.escapeHtml(display.headers || '')}</textarea>
             </div>
             <div class="form-group">
               <label>Request Body Payload (JSON for POST/PUT)</label>
-              <textarea class="form-textarea display-body-input" placeholder='{"stationId": 1}'>${display.requestBody || ''}</textarea>
+              <textarea class="form-textarea display-body-input" placeholder='{"stationId": 1}'>${this.escapeHtml(display.requestBody || '')}</textarea>
             </div>
           </div>
         </details>
@@ -273,22 +273,22 @@ class SignageDemoApp {
         <div class="form-row">
           <div class="form-group flex-1">
             <label>Fallback Offline Asset / URL</label>
-            <input type="text" class="form-input display-fallback-input" value="${display.fallbackUrl || ''}" placeholder="offline.html">
+            <input type="text" class="form-input display-fallback-input" value="${this.escapeHtml(display.fallbackUrl || '')}" placeholder="offline.html">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group flex-1">
             <label>Reload (Mins)</label>
-            <input type="number" class="form-input display-reload-input" value="${display.reloadIntervalMinutes}" min="0">
+            <input type="number" class="form-input display-reload-input" value="${this.escapeHtml(display.reloadIntervalMinutes)}" min="0">
           </div>
           <div class="form-group flex-1">
             <label>Retry (Secs)</label>
-            <input type="number" class="form-input display-retry-input" value="${display.retryIntervalSeconds}" min="3" max="300">
+            <input type="number" class="form-input display-retry-input" value="${this.escapeHtml(display.retryIntervalSeconds)}" min="3" max="300">
           </div>
           <div class="form-group flex-1">
             <label>Zoom (Scale)</label>
-            <input type="number" class="form-input display-zoom-input" value="${display.zoomFactor}" min="0.2" max="3.0" step="0.1">
+            <input type="number" class="form-input display-zoom-input" value="${this.escapeHtml(display.zoomFactor)}" min="0.2" max="3.0" step="0.1">
           </div>
         </div>
 
@@ -417,9 +417,9 @@ class SignageDemoApp {
         <div class="virtual-monitor-header">
           <div class="monitor-id-tag">
             <span class="monitor-live-dot"></span>
-            <span>DISPLAY #${index + 1}: ${display.label}</span>
+            <span>DISPLAY #${index + 1}: ${this.escapeHtml(display.label)}</span>
           </div>
-          <div>${display.bounds.width}×${display.bounds.height} • Zoom: ${display.zoomFactor}x</div>
+          <div>${this.escapeHtml(display.bounds.width)}×${this.escapeHtml(display.bounds.height)} • Zoom: ${this.escapeHtml(display.zoomFactor)}x</div>
         </div>
 
         <div class="virtual-monitor-viewport">
@@ -443,7 +443,7 @@ class SignageDemoApp {
         <div class="dashboard-topbar">
           <div>
             <div class="dashboard-title">${title}</div>
-            <div style="font-size: 0.72rem; color: #94a3b8;">Target Feed: ${this.truncateUrl(display.url)}</div>
+            <div style="font-size: 0.72rem; color: #94a3b8;">Target Feed: ${this.escapeHtml(this.truncateUrl(display.url))}</div>
           </div>
           <div class="dashboard-clock live-clock">--:--:--</div>
         </div>
@@ -462,18 +462,18 @@ class SignageDemoApp {
           <div class="feed-widget">
             <div class="widget-label">Memory Footprint</div>
             <div class="widget-value">78 MB</div>
-            <div class="widget-sub">● Scheduled Purge: ${display.reloadIntervalMinutes}m</div>
+            <div class="widget-sub">● Scheduled Purge: ${this.escapeHtml(display.reloadIntervalMinutes)}m</div>
           </div>
           <div class="feed-widget">
             <div class="widget-label">HTTP Method</div>
-            <div class="widget-value" style="font-size: 1.1rem; color: #38bdf8;">${display.httpMethod}</div>
+            <div class="widget-value" style="font-size: 1.1rem; color: #38bdf8;">${this.escapeHtml(display.httpMethod)}</div>
             <div class="widget-sub">${display.headers ? 'Custom Auth Token Active' : 'Public Feed'}</div>
           </div>
         </div>
 
         <div class="feed-ticker">
           <span style="color: #38bdf8; font-weight: bold;">● STATUS:</span>
-          <span>Seamless Multi-Display Orchestration • Hardware Sleep Inhibited • Resolution: ${display.bounds.width}×${display.bounds.height}</span>
+          <span>Seamless Multi-Display Orchestration • Hardware Sleep Inhibited • Resolution: ${this.escapeHtml(display.bounds.width)}×${this.escapeHtml(display.bounds.height)}</span>
         </div>
       </div>
     `;
@@ -496,7 +496,7 @@ class SignageDemoApp {
         <div class="offline-feed-title">Display Feed Offline</div>
         <div class="offline-feed-sub">ERR_INTERNET_DISCONNECTED: Reconnecting automatically...</div>
         <div class="offline-countdown-badge">
-          Retrying in <span class="offline-timer-sec">${display.retryCountdown}</span>s (Attempt #${display.retryAttempt})
+          Retrying in <span class="offline-timer-sec">${this.escapeHtml(display.retryCountdown)}</span>s (Attempt #${this.escapeHtml(display.retryAttempt)})
         </div>
       </div>
     `;
@@ -744,7 +744,13 @@ class SignageDemoApp {
   }
 
   escapeHtml(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 }
 

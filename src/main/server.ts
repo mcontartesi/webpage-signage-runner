@@ -1,4 +1,5 @@
 import * as http from 'http';
+import * as crypto from 'crypto';
 import { app, powerSaveBlocker } from 'electron';
 import { SignageConfig, SystemStatusResponse, ActionResponse } from '../common/types';
 import { APP_NAME, APP_TITLE, APP_AUTHOR, APP_VERSION } from '../common/constants';
@@ -78,6 +79,21 @@ export class HttpServer {
     } as ActionResponse);
   }
 
+  /**
+   * Performs constant-time comparison to protect against side-channel timing attacks.
+   */
+  private safeCompare(a: string, b: string): boolean {
+    if (typeof a !== 'string' || typeof b !== 'string') {
+      return false;
+    }
+    const aBuf = Buffer.from(a, 'utf8');
+    const bBuf = Buffer.from(b, 'utf8');
+    if (aBuf.length !== bBuf.length) {
+      return false;
+    }
+    return crypto.timingSafeEqual(aBuf, bBuf);
+  }
+
   private authenticate(req: http.IncomingMessage): boolean {
     if (!this.authToken || this.authToken.trim() === '') {
       return true; // No auth required
@@ -86,13 +102,13 @@ export class HttpServer {
     const authHeader = req.headers['authorization'];
     const apiKeyHeader = req.headers['x-api-key'];
 
-    if (apiKeyHeader && apiKeyHeader === this.authToken) {
+    if (typeof apiKeyHeader === 'string' && this.safeCompare(apiKeyHeader, this.authToken)) {
       return true;
     }
 
-    if (authHeader) {
-      const match = authHeader.match(/^Bearer\s+(.*)$/i);
-      if (match && match[1] === this.authToken) {
+    if (typeof authHeader === 'string') {
+      const match = authHeader.match(/^Bearer\s+(.+)$/i);
+      if (match && match[1] && this.safeCompare(match[1].trim(), this.authToken)) {
         return true;
       }
     }
@@ -244,7 +260,10 @@ export class HttpServer {
       // 5. POST /api/displays/:id/reload
       const displayReloadMatch = pathname.match(/^\/api\/displays\/([^/]+)\/reload$/);
       if (displayReloadMatch && method === 'POST') {
-        const displayId = Number(displayReloadMatch[1]);
+        const displayId = parseInt(displayReloadMatch[1], 10);
+        if (isNaN(displayId)) {
+          return this.sendError(res, 400, 'Invalid display ID');
+        }
         const body = await this.parseBody<{ clearCache?: boolean }>(req);
         const success = await watchdogService.reloadDisplay(displayId, body.clearCache ?? true);
         if (!success) {
@@ -259,7 +278,10 @@ export class HttpServer {
       // 6. POST /api/displays/:id/url
       const displayUrlMatch = pathname.match(/^\/api\/displays\/([^/]+)\/url$/);
       if (displayUrlMatch && method === 'POST') {
-        const displayId = Number(displayUrlMatch[1]);
+        const displayId = parseInt(displayUrlMatch[1], 10);
+        if (isNaN(displayId)) {
+          return this.sendError(res, 400, 'Invalid display ID');
+        }
         const body = await this.parseBody<{
           url: string;
           httpMethod?: 'GET' | 'POST' | 'PUT';
@@ -303,7 +325,10 @@ export class HttpServer {
       // 7. GET /api/displays/:id/screenshot
       const displayScreenshotMatch = pathname.match(/^\/api\/displays\/([^/]+)\/screenshot$/);
       if (displayScreenshotMatch && method === 'GET') {
-        const displayId = Number(displayScreenshotMatch[1]);
+        const displayId = parseInt(displayScreenshotMatch[1], 10);
+        if (isNaN(displayId)) {
+          return this.sendError(res, 400, 'Invalid display ID');
+        }
         const win = windowManager.getWindowForDisplay(displayId);
         if (!win || win.isDestroyed()) {
           return this.sendError(res, 404, `Display with ID ${displayId} not found`);

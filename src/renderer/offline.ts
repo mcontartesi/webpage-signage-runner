@@ -123,10 +123,20 @@ class OfflineController {
     this.btnRetryNow.textContent = 'Connecting...';
     this.btnRetryNow.disabled = true;
 
-    if (window.signageAPI && window.signageAPI.retryDisplay) {
+    if (window.signageAPI && typeof window.signageAPI.retryDisplay === 'function') {
       window.signageAPI.retryDisplay(this.displayId);
     } else {
-      window.location.href = this.targetUrl;
+      // Validate URL scheme to prevent javascript: or unsafe URI execution
+      try {
+        const parsed = new URL(this.targetUrl, window.location.origin);
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'file:') {
+          window.location.href = parsed.href;
+        } else {
+          console.error('[Security] Blocked navigation to unsafe URL protocol:', parsed.protocol);
+        }
+      } catch (err) {
+        console.error('[Security] Failed to parse target URL for retry:', err);
+      }
     }
   }
 }
