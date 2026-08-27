@@ -1,0 +1,30 @@
+# Webpage Signage Runner
+> Enterprise-grade, unattended Multi-Display Digital Signage Kiosk & Video Wall orchestrator for Windows and Linux.
+> Designed, architected, and maintained by Maximiliano Contartesi.
+
+## Project Overview
+- **Name:** Webpage Signage Runner
+- **Author:** Maximiliano Contartesi (Solutions Architect & Principal Software Engineer)
+- **Repository:** https://github.com/mcontartesi/webpage-signage-runner
+- **Live Demo & Simulator:** https://mcontartesi.github.io/webpage-signage-runner/
+- **Documentation Wiki:** https://github.com/mcontartesi/webpage-signage-runner/wiki
+- **License:** MIT License (Open Source, 100% free for commercial & personal deployment)
+- **Platforms:** Windows 10/11/Server (x64), Linux Ubuntu/Debian/Fedora/Arch/Raspberry Pi OS (x64)
+- **Tech Stack:** TypeScript 7, Electron 44, Node.js 22 LTS, Zod Schema Validation, esbuild, Vitest
+
+## Core Value & Key Capabilities
+- **Multi-Display Orchestration:** Automatically discovers all physical monitors via `screen.getAllDisplays()`, pinning independent, borderless, always-on-top browser windows to exact coordinates.
+- **Dynamic Hot-Plugging:** Handles runtime monitor connection and disconnection without application restarts.
+- **Advanced HTTP Methods & Auth:** Supports `GET`, `POST`, and `PUT` requests per display with custom header injection (`Authorization: Bearer <token>`, `X-Api-Key`) and JSON payload bodies.
+- **24/7 Self-Healing Watchdog:** Executes periodic forced hard reloads with deep Chromium cache purges (disk, memory, Service Workers, CacheStorage) every 60 minutes to prevent memory leaks and ensure the freshest web app content.
+- **Offline Diagnostics & Auto-Reconnect:** Seamlessly transitions to an animated offline fallback screen with live countdown timer upon network loss, instantly reloading when connection returns.
+- **Embedded REST API & Swagger UI:** Integrated HTTP server on port `9191` with interactive Swagger UI (`/docs`), OpenAPI 3.0 spec (`/openapi.json`), health probes (`/health`), and live PNG screenshot capture (`/api/displays/:id/screenshot`).
+- **OS Hardening & Power Management:** Suppresses system sleep via `powerSaveBlocker`, hides mouse cursor globally, and provides native OS autostart on boot.
+
+## Documentation Index
+- [Full LLM Context Guide](https://mcontartesi.github.io/webpage-signage-runner/llms-full.txt): Complete technical specification and configuration manual.
+- [GitHub Wiki](https://github.com/mcontartesi/webpage-signage-runner/wiki): Official user guides and architecture diagrams.
+- [Spanish Guide](https://github.com/mcontartesi/webpage-signage-runner/wiki/Guia-en-Espanol): Guía completa de instalación y uso en español.
+- [Chinese Guide](https://github.com/mcontartesi/webpage-signage-runner/wiki/Chinese-Guide): 中文用户与部署完整指南.
+- [REST API Reference](https://github.com/mcontartesi/webpage-signage-runner/blob/main/API.md): Endpoints, curl examples, and authentication schemas.
+- [Production Deployment](https://github.com/mcontartesi/webpage-signage-runner/blob/main/DEPLOYMENT.md): Windows AutoLogon, Shell Launcher, and Linux systemd kiosk configurations.

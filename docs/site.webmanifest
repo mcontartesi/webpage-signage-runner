@@ -1,0 +1,19 @@
+{
+  "name": "Webpage Signage Runner - Digital Signage Kiosk & Simulator",
+  "short_name": "Signage Runner",
+  "description": "Enterprise-grade unattended Multi-Display Digital Signage Kiosk orchestrator for Windows and Linux by Maximiliano Contartesi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0f19",
+  "theme_color": "#0ea5e9",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

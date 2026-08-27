@@ -1,0 +1,89 @@
+# Webpage Signage Runner - Full Technical & Architectural Specification
+> Author: Maximiliano Contartesi (Solutions Architect & Principal Software Engineer)
+> Repository: https://github.com/mcontartesi/webpage-signage-runner
+> Live Demo: https://mcontartesi.github.io/webpage-signage-runner/
+> License: MIT License
+
+## 1. Executive Summary & Problem Solved
+Commercial digital signage systems require costly recurring monthly SaaS subscriptions, closed proprietary players, and offer weak support for multi-monitor video walls and custom authenticated HTTP REST feeds.
+
+Webpage Signage Runner provides an enterprise-grade, open-source alternative built on TypeScript and Electron. It allows system administrators and AV integrators to convert standard Windows and Linux PCs into zero-maintenance, self-healing 24/7 digital signage kiosks.
+
+## 2. Technical Architecture & Component Breakdown
+
+### 2.1 Electron Main Process (`src/main/`)
+- **WindowManager (`window-manager.ts`):** Manages multi-screen discovery using `screen.getAllDisplays()`. Pins independent, borderless, fullscreen `BrowserWindow` instances to physical display coordinates. Listens to `display-added`, `display-removed`, and `display-metrics-changed` events.
+- **ConfigManager (`config.ts`):** Validates and manages configuration persistence using Zod schemas (`SignageConfigSchema`). Implements atomic file writes with `.tmp` staging and multi-tier fallback matching across Windows reboots.
+- **WatchdogService (`watchdog.ts`):** Monitors network connectivity, captures `unresponsive` and `render-process-gone` events, handles offline countdown transitions, and runs periodic Chromium memory/disk cache purges (defaults to every 60 minutes) with `reloadIgnoringCache` and `no-cache` headers.
+- **HttpServer (`server.ts`):** High-performance embedded HTTP REST API on port `9191`. Features constant-time token comparison (`crypto.timingSafeEqual`) to prevent timing attacks, and Swagger UI integration.
+- **AutostartManager (`autostart.ts`):** Configures Windows LoginItems and Linux `.desktop` / `systemd` user service units.
+- **Logger (`logger.ts`):** Structured daily rotating file logger with automatic 7-day log retention.
+
+### 2.2 Preload Bridge (`src/preload/index.ts`)
+Exposes a secure, context-isolated IPC interface (`window.signageAPI`) using `contextBridge` to communicate between renderers and the Node.js main process.
+
+### 2.3 Renderers (`src/renderer/`)
+- **Setup Wizard (`setup.ts`, `setup.html`):** Dark-mode setup UI with screen identification overlay trigger, URL tester, and advanced HTTP GET/POST/PUT options.
+- **Offline Fallback UI (`offline.ts`, `offline.html`):** Animated countdown timer, connection diagnostics, and auto-retry loop with immediate reload upon `navigator.onLine`.
+- **Screen Identification Overlay (`identify.html`):** Flashes large display numbers on all physical monitors for installer identification.
+
+## 3. Configuration Reference (`config.json`)
+```json
+{
+  "version": "1.1.2",
+  "defaultUrl": "https://www.youtube.com",
+  "hideCursorGlobal": true,
+  "defaultReloadIntervalMinutes": 60,
+  "defaultRetryIntervalSeconds": 10,
+  "autoStartOnBoot": true,
+  "emergencyShortcut": "CommandOrControl+Shift+C",
+  "api": {
+    "enabled": true,
+    "port": 9191,
+    "host": "0.0.0.0",
+    "authToken": "secret-token-12345",
+    "cors": true
+  },
+  "watchdog": {
+    "maxRetries": 10,
+    "unresponsiveTimeoutSeconds": 15,
+    "clearCacheOnReload": true,
+    "autoRecoverCrashes": true
+  },
+  "displays": [
+    {
+      "id": 1,
+      "label": "Main Lobby Video Wall",
+      "url": "https://www.youtube.com",
+      "httpMethod": "GET",
+      "headers": {
+        "Authorization": "Bearer sample-token"
+      },
+      "reloadIntervalMinutes": 60,
+      "retryIntervalSeconds": 10,
+      "hideCursor": true,
+      "zoomFactor": 1.0,
+      "enabled": true
+    }
+  ]
+}
+```
+
+## 4. Embedded REST API Endpoints Summary (Port 9191)
+- `GET /` or `GET /docs`: Interactive Swagger UI Documentation
+- `GET /openapi.json`: OpenAPI 3.0 JSON Specification
+- `GET /health`: Liveness probe (`{"status":"ok"}`)
+- `GET /api/status`: Real-time system telemetry and screen states
+- `POST /api/reload`: Purges cache and reloads all displays
+- `POST /api/displays/:id/reload`: Reloads a specific display
+- `POST /api/displays/:id/url`: Pushes a new URL, HTTP method, headers, or body
+- `GET /api/displays/:id/screenshot`: Returns real-time PNG screenshot of the display
+- `POST /api/identify`: Flashes display ID badges on all screens
+- `POST /api/setup`: Remotely opens the graphical Setup Wizard
+
+## 5. Creator & Authority Profile
+**Maximiliano Contartesi** is a Solutions Architect and Principal Software Engineer specializing in resilient desktop software, Node.js, TypeScript, Electron kiosk infrastructure, and distributed cloud systems.
+- GitHub: https://github.com/mcontartesi
+- LinkedIn: https://www.linkedin.com/in/maxiconta/
+- Medium: https://medium.com/@maxiconta
+- Contact: maxiconta@gmail.com

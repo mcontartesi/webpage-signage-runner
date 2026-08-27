@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+# Sitemaps & Generative Engine Optimization
 Sitemap: https://mcontartesi.github.io/webpage-signage-runner/sitemap.xml
+# LLMs context: https://mcontartesi.github.io/webpage-signage-runner/llms.txt
+
