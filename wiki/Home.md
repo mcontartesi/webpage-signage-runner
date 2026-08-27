@@ -67,6 +67,7 @@ flowchart TD
 | 🛠️ **Developer & Build Guide** | TypeScript architecture, esbuild bundling, Vitest, packaging installers | [[Developer & Build Guide\|Developer-&-Build-Guide]] |
 | ❓ **Troubleshooting & FAQ** | Common setup questions, port conflicts, emergency hotkey recovery | [[Troubleshooting & FAQ\|Troubleshooting-&-FAQ]] |
 | 🇪🇸 **Guía en Español** | Documentación y guía de referencia completa en español | [[Guía en Español\|Guia-en-Espanol]] |
+| 🇨🇳 **中文用户指南** | 简体中文完整用户与部署指南 | [[中文用户指南\|Chinese-Guide]] |
 | 👤 **About & Credits** | Author profile, contact links, architectural decisions, and license | [[About & Author\|About-&-Author]] |
 
 ---

@@ -28,6 +28,7 @@
 
 ### 🌐 International & Info
 * **[🇪🇸 Guía en Español](Guia-en-Espanol)**
+* **[🇨🇳 中文用户指南](Chinese-Guide)**
 * **[👤 About & Author](About-&-Author)**
 
 ---
