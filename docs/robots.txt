@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mcontartesi.github.io/webpage-signage-runner/sitemap.xml
