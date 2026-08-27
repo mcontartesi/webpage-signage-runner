@@ -35,6 +35,7 @@
     "release": "npm run build && electron-builder --publish always",
     "release:win": "npm run build && electron-builder --win --publish always",
     "release:linux": "npm run build && electron-builder --linux --publish always",
+    "wiki": "node scripts/publish-wiki.js",
     "wiki:publish": "node scripts/publish-wiki.js"
   },
   "dependencies": {
