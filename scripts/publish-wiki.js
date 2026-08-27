@@ -35,18 +35,17 @@ async function main() {
     fs.rmSync(TEMP_CLONE_DIR, { recursive: true, force: true });
   }
 
+  let isNewRepo = false;
   try {
     console.log(`📡 Conectando al repositorio Git de la Wiki: ${WIKI_GIT_URL}...`);
     execSync(`git clone "${WIKI_GIT_URL}" "${TEMP_CLONE_DIR}"`, { stdio: 'pipe' });
   } catch (err) {
-    console.warn('\n⚠️  No se pudo clonar el repositorio de la Wiki automáticamente.');
-    console.warn('👉 En GitHub, el repositorio Git de la Wiki solo se crea tras guardar la primera página en la web:');
-    console.warn('   1. Abre en tu navegador: https://github.com/' + REPO_NAME + '/wiki');
-    console.warn('   2. Haz clic en el botón verde "Create the first page" (Crear la primera página).');
-    console.warn('   3. Haz clic abajo en el botón verde "Save page" (Guardar página).');
-    console.warn('   4. Vuelve a ejecutar: npm run wiki:publish\n');
-    console.error('Detalle del error de Git:', err.message);
-    process.exit(1);
+    console.log('ℹ️  El clon falló. Intentando inicialización directa del repositorio Git de la Wiki...');
+    isNewRepo = true;
+    fs.mkdirSync(TEMP_CLONE_DIR, { recursive: true });
+    execSync('git init', { cwd: TEMP_CLONE_DIR });
+    execSync(`git remote add origin "${WIKI_GIT_URL}"`, { cwd: TEMP_CLONE_DIR });
+    execSync('git branch -M master', { cwd: TEMP_CLONE_DIR });
   }
 
   try {
@@ -76,7 +75,17 @@ async function main() {
     console.log('✅ ¡Wiki de GitHub publicada con éxito!');
     console.log(`🔗 Ver en: https://github.com/${REPO_NAME}/wiki`);
   } catch (err) {
-    console.error('❌ Error al actualizar la Wiki:', err.message);
+    console.error('\n❌ Error al actualizar la Wiki de GitHub:');
+    if (err.message.includes('not found') || err.message.includes('Repository not found')) {
+      console.warn('\n💡 Motivo: Por política interna de GitHub, el repositorio Git de la Wiki (*.wiki.git) permanece bloqueado hasta que se crea la primera página desde la interfaz web.');
+      console.warn('👉 Para activarlo en 5 segundos:');
+      console.warn(`   1. Abre en tu navegador: https://github.com/${REPO_NAME}/wiki`);
+      console.warn('   2. Haz clic en el botón verde "Create the first page" (Crear la primera página).');
+      console.warn('   3. Haz clic abajo en el botón verde "Save page" (Guardar página).');
+      console.warn('   4. Vuelve a ejecutar este comando: npm run wiki:publish\n');
+    } else {
+      console.error(err.message);
+    }
     process.exit(1);
   } finally {
     if (fs.existsSync(TEMP_CLONE_DIR)) {
