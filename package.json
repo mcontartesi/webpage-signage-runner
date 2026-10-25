@@ -47,6 +47,6 @@
     "electron-builder": "^26.15.3",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.12"
   }
 }
